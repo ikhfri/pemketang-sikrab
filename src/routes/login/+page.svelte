@@ -9,52 +9,52 @@
     name="description"
     content="Portal pemilihan Ketua Angkatan 63 SIKRABTEK."
   />
+  <meta name="theme-color" content="#242044" />
 </svelte:head>
 
 <main class="flex flex-1 items-center bg-[#242044] text-[#fbf9ff]">
   <div
-    class="mx-auto grid w-full max-w-7xl items-center gap-12 px-5 py-12 sm:px-8 sm:py-14 md:grid-cols-2 md:gap-12 lg:gap-24 lg:px-12 lg:py-16"
+    class="mx-auto grid w-full max-w-7xl items-center gap-8 px-5 py-8 sm:px-8 sm:py-12 md:grid-cols-2 md:gap-12 lg:gap-24 lg:px-12 lg:py-16"
   >
-    <!-- Hero -->
-    <section class="min-w-0 md:py-8">
-      <p class="mb-6 text-xs font-semibold tracking-wide text-[#c5b8d6]">
+    <!-- Hero: hidden on mobile -->
+    <section class="hidden min-w-0 md:block md:py-8">
+      <p class="mb-5 text-xs font-medium tracking-widest text-[#c5b8d6]">
         PEMILIHAN KETUA ANGKATAN 63
       </p>
 
       <h1
-        class="m-0 text-5xl leading-[1.05] font-bold tracking-[-0.06em] sm:text-6xl lg:text-7xl"
+        class="m-0 text-5xl leading-[1.05] font-bold tracking-[-0.06em] lg:text-7xl"
       >
         Saatnya<br />
         <span class="text-[#c5b8d6]">menentukan.</span>
       </h1>
 
-      <p class="mt-6 max-w-md text-sm leading-7 text-[#b8b5c5] sm:text-base">
+      <p class="mt-6 max-w-md text-sm leading-7 text-[#b8b5c5] lg:text-base">
         Kenali pilihan lo, tentukan siapa yang paling tepat, dan ikut
         menentukan langkah Angkatan 63 ke depan.
-      </p>
-
-      <p
-        class="mt-10 max-w-md border-t border-white/10 pt-5 text-xs leading-6 text-[#85859f]"
-      >
-        Satu suara dari lo ikut menentukan arah angkatan kita.
       </p>
     </section>
 
     <!-- Login -->
-    <section
-      class="w-full min-w-0 md:max-w-[400px] md:justify-self-end"
-    >
-      <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
-        Halo, Angkatan 63.
-      </h2>
+    <section class="mx-auto w-full max-w-[400px] min-w-0 md:justify-self-end">
+      <!-- Simple mobile identity -->
+      <div class="mb-9 md:mb-8">
+        <p class="text-xs font-semibold tracking-widest text-[#c5b8d6]">
+          SIKRABTEK
+        </p>
 
-      <p class="mt-2 mb-7 text-sm leading-6 text-[#b8b5c5]">
-        Login dulu buat lanjut ke halaman pemilihan.
-      </p>
+        <h1 class="mt-5 text-3xl font-semibold tracking-tight sm:text-4xl">
+          Masuk
+        </h1>
+
+        <p class="mt-2 text-sm leading-6 text-[#b8b5c5]">
+          Login untuk melanjutkan ke pemilihan Ketua Angkatan 63.
+        </p>
+      </div>
 
       {#if form?.error}
         <div
-          class="mb-5 rounded-lg border border-[#e2725b]/30 bg-[#e2725b]/10 px-4 py-3 text-sm leading-6 text-[#f2b5a8]"
+          class="mb-5 rounded-md border border-[#e2725b]/40 bg-[#e2725b]/10 px-3 py-3 text-sm text-[#f2b5a8]"
           role="alert"
         >
           {form.error}
@@ -62,7 +62,6 @@
       {/if}
 
       <form method="POST" class="space-y-5">
-        <!-- NIM -->
         <div>
           <label
             for="nim"
@@ -75,23 +74,22 @@
             id="nim"
             name="nim"
             type="text"
-            placeholder="Masukkan NIM lo"
+            placeholder="Masukkan NIM"
             value={form?.nim ?? ''}
             autocomplete="username"
             autocapitalize="off"
             spellcheck="false"
             required
-            class="h-12 w-full rounded-lg border border-white/10 bg-[#1d1a37] px-4 text-sm text-white outline-none transition-colors placeholder:text-[#77738e] hover:border-white/20 focus:border-[#c5b8d6] focus:ring-2 focus:ring-[#c5b8d6]/10"
+            class="h-12 w-full rounded-md border border-white/15 bg-[#1d1a37] px-3.5 text-base text-white outline-none placeholder:text-[#77738e] focus:border-[#c5b8d6]"
           />
         </div>
 
-        <!-- Password -->
         <div>
           <label
             for="password"
             class="mb-2 block text-sm font-medium text-[#e0dbea]"
           >
-            Kata Sandi
+            Kata sandi
           </label>
 
           <div class="relative">
@@ -99,10 +97,10 @@
               id="password"
               name="password"
               type={showPassword ? 'text' : 'password'}
-              placeholder="Masukkan kata sandi lo"
+              placeholder="Masukkan kata sandi"
               autocomplete="current-password"
               required
-              class="h-12 w-full rounded-lg border border-white/10 bg-[#1d1a37] py-0 pl-4 pr-12 text-sm text-white outline-none transition-colors placeholder:text-[#77738e] hover:border-white/20 focus:border-[#c5b8d6] focus:ring-2 focus:ring-[#c5b8d6]/10"
+              class="h-12 w-full rounded-md border border-white/15 bg-[#1d1a37] py-0 pl-3.5 pr-12 text-base text-white outline-none placeholder:text-[#77738e] focus:border-[#c5b8d6]"
             />
 
             <button
@@ -112,10 +110,9 @@
                 ? 'Sembunyikan kata sandi'
                 : 'Tampilkan kata sandi'}
               aria-pressed={showPassword}
-              class="absolute inset-y-0 right-0 grid w-12 place-items-center rounded-r-lg text-[#85859f] transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-[#c5b8d6]"
+              class="absolute inset-y-0 right-0 grid w-11 place-items-center text-[#b8b5c5] hover:text-white focus-visible:outline-2 focus-visible:outline-[#c5b8d6]"
             >
               {#if showPassword}
-                <!-- Eye off -->
                 <svg
                   viewBox="0 0 24 24"
                   fill="none"
@@ -131,7 +128,6 @@
                   />
                 </svg>
               {:else}
-                <!-- Eye -->
                 <svg
                   viewBox="0 0 24 24"
                   fill="none"
@@ -157,32 +153,16 @@
           </div>
         </div>
 
-        <!-- Submit -->
         <button
           type="submit"
-          class="group mt-2 flex h-12 w-full items-center justify-between rounded-lg bg-[#c5b8d6] px-4 text-sm font-bold text-[#242044] transition-colors hover:bg-[#d8cde5] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c5b8d6] active:bg-[#b5a6ca]"
+          class="mt-2 flex h-12 w-full items-center justify-center rounded-md bg-[#c5b8d6] px-4 text-sm font-semibold text-[#242044] transition-colors hover:bg-[#d8cde5] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c5b8d6] active:bg-[#b5a6ca]"
         >
-          <span>Masuk ke pemilihan</span>
-
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            class="h-5 w-5 transition-transform duration-200 group-hover:translate-x-1"
-            aria-hidden="true"
-          >
-            <path
-              d="M5 12h14m-6-6 6 6-6 6"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
+          Masuk ke pemilihan
         </button>
       </form>
 
-      <p class="mt-5 text-xs leading-6 text-[#85859f]">
-        Gunakan akun lo sendiri dan pastikan informasi login sudah benar.
+      <p class="mt-6 text-xs leading-5 text-[#85859f]">
+        Gunakan akun lo sendiri. Jangan bagikan kata sandi ke orang lain.
       </p>
     </section>
   </div>

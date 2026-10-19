@@ -1,1613 +1,408 @@
+
 <script lang="ts">
+  let { data } = $props();
 
-let { data } = $props();
+  let countdown = $state(10);
+  let showResults = $state(false);
 
+  const PIE_RADIUS = 58;
+  const PIE_CENTER = 70;
 
+  const pieColors = [
+    '#9564d9',
+    '#e83f69',
+    '#3979d7',
+    '#ff7950',
+    '#986c79',
+    '#f23a9e',
+    '#e2d4f2',
+    '#44d78e',
+    '#f7bd43',
+    '#40a7ef'
+  ];
 
-    let countdown = $state(10);
+  $effect(() => {
+    if (showResults) return;
 
-    let showResults = $state(false);
+    countdown = 10;
 
+    const interval = setInterval(() => {
+      countdown -= 1;
 
+      if (countdown <= 0) {
+        showResults = true;
+        clearInterval(interval);
+      }
+    }, 1000);
 
-    const PIE_RADIUS = 58;
+    return () => clearInterval(interval);
+  });
 
-    const PIE_CENTER = 70;
+  function getPercentage(voteCount: number) {
+    if (data.totalVotes === 0) return 0;
+    return (voteCount / data.totalVotes) * 100;
+  }
 
+  function getRoundedPercentage(voteCount: number) {
+    return Math.round(getPercentage(voteCount));
+  }
 
+  let sortedResults = $derived(
+    [...data.results].sort((a, b) => b.voteCount - a.voteCount)
+  );
 
-        const pieColors = [
-        "#9564d9", // Noctis
-        "#e83f69", // Valor
-        "#3979d7", // Melankara
-        "#ff7950", // Resolve
-        "#986c79", // Bingbong
-        "#f23a9e", // Rubora
-        "#e2d4f2", // Tranquil
-        "#44d78e", // Aversa
-        "#f7bd43", // Euphoria
-        "#40a7ef"  // Aspire
-    ];
+  let selectedCandidate = $derived(
+    sortedResults.length > 0 ? sortedResults[0] : null
+  );
 
+  function polarToCartesian(
+    centerX: number,
+    centerY: number,
+    radius: number,
+    angleInDegrees: number
+  ) {
+    const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180;
 
+    return {
+      x: centerX + radius * Math.cos(angleInRadians),
+      y: centerY + radius * Math.sin(angleInRadians)
+    };
+  }
 
-    $effect(() => {
-
-        if (showResults) {
-
-            return;
-
-        }
-
-
-
-        countdown = 10;
-
-
-
-        const interval = setInterval(() => {
-
-            countdown -= 1;
-
-
-
-            if (countdown <= 0) {
-
-                showResults = true;
-
-                clearInterval(interval);
-
-            }
-
-        }, 1000);
-
-
-
-        return () => clearInterval(interval);
-
-    });
-
-
-
-    function getPercentage(voteCount: number) {
-
-        if (data.totalVotes === 0) {
-
-            return 0;
-
-        }
-
-
-
-        return (voteCount / data.totalVotes) * 100;
-
+  function createPieSlice(startAngle: number, endAngle: number) {
+    if (endAngle - startAngle >= 359.999) {
+      return [
+        `M ${PIE_CENTER} ${PIE_CENTER - PIE_RADIUS}`,
+        `A ${PIE_RADIUS} ${PIE_RADIUS} 0 1 1 ${PIE_CENTER} ${PIE_CENTER + PIE_RADIUS}`,
+        `A ${PIE_RADIUS} ${PIE_RADIUS} 0 1 1 ${PIE_CENTER} ${PIE_CENTER - PIE_RADIUS}`,
+        'Z'
+      ].join(' ');
     }
 
+    const start = polarToCartesian(
+      PIE_CENTER,
+      PIE_CENTER,
+      PIE_RADIUS,
+      endAngle
+    );
 
+    const end = polarToCartesian(
+      PIE_CENTER,
+      PIE_CENTER,
+      PIE_RADIUS,
+      startAngle
+    );
 
-    function getRoundedPercentage(voteCount: number) {
+    const angle = endAngle - startAngle;
+    const largeArcFlag = angle > 180 ? 1 : 0;
 
-        return Math.round(getPercentage(voteCount));
+    return [
+      `M ${PIE_CENTER} ${PIE_CENTER}`,
+      `L ${start.x} ${start.y}`,
+      `A ${PIE_RADIUS} ${PIE_RADIUS} 0 ${largeArcFlag} 0 ${end.x} ${end.y}`,
+      'Z'
+    ].join(' ');
+  }
 
+  let pieSlices = $derived.by(() => {
+    if (data.totalVotes === 0 || sortedResults.length === 0) {
+      return [];
     }
 
+    let currentAngle = 0;
 
+    return sortedResults
+      .map((candidate, index) => {
+        const percentage =
+          (candidate.voteCount / data.totalVotes) * 100;
 
-    let sortedResults = $derived(
+        const startAngle = currentAngle;
+        const endAngle = currentAngle + percentage * 3.6;
 
-        [...data.results].sort(
-
-            (a, b) => b.voteCount - a.voteCount
-
-        )
-
-    );
-
-
-
-    let selectedCandidate = $derived(
-
-        sortedResults.length > 0
-
-            ? sortedResults[0]
-
-            : null
-
-    );
-
-
-
-    function polarToCartesian(
-
-        centerX: number,
-
-        centerY: number,
-
-        radius: number,
-
-        angleInDegrees: number
-
-    ) {
-
-        const angleInRadians =
-
-            ((angleInDegrees - 90) * Math.PI) / 180;
-
-
+        currentAngle = endAngle;
 
         return {
-
-            x:
-
-                centerX +
-
-                radius * Math.cos(angleInRadians),
-
-
-
-            y:
-
-                centerY +
-
-                radius * Math.sin(angleInRadians)
-
+          candidate,
+          index,
+          percentage,
+          path: createPieSlice(startAngle, endAngle),
+          color: pieColors[index % pieColors.length]
         };
-
-    }
-
-
-
-    function createPieSlice(
-
-        startAngle: number,
-
-        endAngle: number
-
-    ) {
-
-        const start = polarToCartesian(
-
-            PIE_CENTER,
-
-            PIE_CENTER,
-
-            PIE_RADIUS,
-
-            endAngle
-
-        );
-
-
-
-        const end = polarToCartesian(
-
-            PIE_CENTER,
-
-            PIE_CENTER,
-
-            PIE_RADIUS,
-
-            startAngle
-
-        );
-
-
-
-        const angle = endAngle - startAngle;
-
-
-
-        const largeArcFlag = angle > 180 ? 1 : 0;
-
-
-
-        return [
-
-            `M ${PIE_CENTER} ${PIE_CENTER}`,
-
-            `L ${start.x} ${start.y}`,
-
-            `A ${PIE_RADIUS} ${PIE_RADIUS} 0 ${largeArcFlag} 0 ${end.x} ${end.y}`,
-
-            "Z"
-
-        ].join(" ");
-
-    }
-
-
-
-    let pieSlices = $derived.by(() => {
-
-        if (
-
-            data.totalVotes === 0 ||
-
-            sortedResults.length === 0
-
-        ) {
-
-            return [];
-
-        }
-
-
-
-        let currentAngle = 0;
-
-
-
-        return sortedResults.map((candidate, index) => {
-
-            const percentage =
-
-                (candidate.voteCount / data.totalVotes) *
-
-                100;
-
-
-
-            const startAngle = currentAngle;
-
-
-
-            const endAngle =
-
-                currentAngle + percentage * 3.6;
-
-
-
-            currentAngle = endAngle;
-
-
-
-            return {
-
-                candidate,
-
-                index,
-
-                percentage,
-
-                path: createPieSlice(
-
-                    startAngle,
-
-                    endAngle
-
-                ),
-
-                color:
-
-                    pieColors[
-
-                        index % pieColors.length
-
-                    ]
-
-            };
-
-        });
-
-    });
-
+      })
+      .filter((slice) => slice.percentage > 0);
+  });
 </script>
 
-
-
 <svelte:head>
-
-    <title>Hasil Voting — Admin</title>
-
-
-
-    <meta
-
-        name="description"
-
-        content="Hasil voting Ketua dan Wakil Angkatan."
-
-    />
-
+  <title>Hasil Pemilihan — SIKRABTEK 63</title>
+  <meta
+    name="description"
+    content="Pengumuman kandidat terpilih dan distribusi suara Pemilihan Ketua Angkatan 63."
+  />
+  <meta name="theme-color" content="#242044" />
 </svelte:head>
 
+<div class="min-h-screen bg-[#242044] text-white">
+  {#if !showResults}
+    <main
+      class="flex min-h-screen flex-col items-center justify-center px-5 text-center"
+      aria-live="polite"
+    >
 
 
-<div class="min-h-screen bg-[#242044] text-[#FFFFFF]">
+      <span
+        class="mt-5 text-[200px] font-semibold tracking-tight tabular-nums sm:text-[400px]"
+      >
+        {countdown}
+      </span>
 
-    {#if !showResults}
 
+    </main>
+  {:else}
+    <header class="border-b border-white/10">
+      <div
+        class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4 sm:px-8"
+      >
+        <div class="flex min-w-0 items-center gap-3">
+          <img
+            src="/images/logo.jpg"
+            alt="SIKRABTEK 63"
+            class="h-9 w-9 shrink-0 rounded-lg object-cover"
+          />
 
+          <div class="min-w-0">
+            <p class="text-sm font-semibold">SIKRABTEK 63</p>
+          </div>
+        </div>
 
-
-        <main
-
-            class="flex min-h-screen items-center justify-center bg-[#242044]"
-
+        <a
+          href="/admin"
+          class="shrink-0 rounded-md px-3 py-2 text-sm text-[#c7c2df] transition hover:bg-white/5 hover:text-white focus-visible:outline-2 focus-visible:outline-[#c5b8d6]"
         >
+          Kembali
+        </a>
+      </div>
+    </header>
 
-            <span
-
-                class="text-[9rem] font-bold leading-none tracking-[-0.08em] text-[#FFFFFF] tabular-nums sm:text-[12rem]"
-
-            >
-
-                {countdown}
-
-            </span>
-
-        </main>
-
-    {:else}
-
-
-
-
-        <header
-
-            class="border-b border-[#514b70] bg-[#242044]"
-
-        >
-
-            <div
-
-                class="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 sm:px-8"
-
-            >
-
-                <div class="flex items-center gap-3">
-
+    <main class="mx-auto max-w-5xl px-5 py-10 sm:px-8 sm:py-16">
+      {#if selectedCandidate}
+        <!-- Pengumuman kandidat terpilih -->
+        <section class="text-center">
+          <h1
+            class="mx-auto mt-4 max-w-2xl text-3xl leading-tight font-semibold tracking-tight sm:text-7xl"
+          >
+            Selamat kepada
+          </h1>
+          <div
+            class="mx-auto mt-9 max-w-2xl rounded-2xl border border-white/10 bg-[#2d284b] p-4 sm:mt-12 sm:p-8"
+          >
+            <div class="grid grid-cols-2 gap-4 sm:gap-8">
+              <div class="min-w-0">
+                <div
+                  class="mx-auto aspect-[4/5] w-full max-w-[220px] overflow-hidden rounded-xl bg-[#242044]"
+                >
+                  {#if selectedCandidate.ketuaPhotoUrl}
                     <img
-
-                        src="/images/logo.jpg"
-
-                        alt="SIKRABTEK 63"
-
-                        class="h-10 w-10 rounded-xl border border-[#514b70] object-cover"
-
+                      src={selectedCandidate.ketuaPhotoUrl}
+                      alt={selectedCandidate.ketuaName}
+                      class="h-full w-full object-cover"
                     />
-
-
-
-                    <div>
-
-                        <p
-
-                            class="text-[10px] font-bold uppercase tracking-[0.2em] text-[#5C6B9C]"
-
-                        >
-
-                            Admin Panel
-
-                        </p>
-
-
-
-                        <h1
-
-                            class="mt-1 text-lg font-bold tracking-tight text-[#FFFFFF] sm:text-xl"
-
-                        >
-
-                            Hasil Voting
-
-                        </h1>
-
+                  {:else}
+                    <div
+                      class="flex h-full items-center justify-center px-3 text-center text-xs text-[#85859f]"
+                    >
+                      Foto tidak tersedia
                     </div>
-
+                  {/if}
                 </div>
 
-
-
-                <a
-
-                    href="/admin"
-
-                    class="inline-flex items-center gap-2 border border-[#514b70] bg-[#2d284b] px-4 py-2.5 text-sm font-semibold text-[#a39dbf] transition hover:border-[#5C6B9C] hover:bg-[#403a61] hover:text-[#FFFFFF]"
-
+                <p
+                  class="mt-4 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#a39dbf] sm:text-xs"
                 >
+                  Ketua
+                </p>
 
-                    <svg
+                <h2
+                  class="mt-1 break-words text-sm leading-5 font-semibold sm:text-xl sm:leading-7"
+                >
+                  {selectedCandidate.ketuaName}
+                </h2>
+              </div>
 
-                        xmlns="http://www.w3.org/2000/svg"
-
-                        viewBox="0 0 24 24"
-
-                        fill="none"
-
-                        stroke="currentColor"
-
-                        stroke-width="2"
-
-                        class="h-4 w-4"
-
+              <div class="min-w-0">
+                <div
+                  class="mx-auto aspect-[4/5] w-full max-w-[220px] overflow-hidden rounded-xl bg-[#242044]"
+                >
+                  {#if selectedCandidate.wakilPhotoUrl}
+                    <img
+                      src={selectedCandidate.wakilPhotoUrl}
+                      alt={selectedCandidate.wakilName}
+                      class="h-full w-full object-cover"
+                    />
+                  {:else}
+                    <div
+                      class="flex h-full items-center justify-center px-3 text-center text-xs text-[#85859f]"
                     >
+                      Foto tidak tersedia
+                    </div>
+                  {/if}
+                </div>
 
-                        <path
+                <p
+                  class="mt-4 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#a39dbf] sm:text-xs"
+                >
+                  Wakil Ketua
+                </p>
 
-                            stroke-linecap="round"
-
-                            stroke-linejoin="round"
-
-                            d="M19 12H5m7 7-7-7 7-7"
-
-                        />
-
-                    </svg>
-
-
-
-                    Kembali
-
-                </a>
-
+                <h2
+                  class="mt-1 break-words text-sm leading-5 font-semibold sm:text-xl sm:leading-7"
+                >
+                  {selectedCandidate.wakilName}
+                </h2>
+              </div>
             </div>
 
-        </header>
-
-
-
-
-
-
-        <main
-
-            class="mx-auto max-w-6xl px-5 py-10 sm:px-8 sm:py-14"
-
-        >
-
-
-            <div
-
-                class="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between"
-
-            >
-
+            <div class="mt-7 border-t border-white/10 pt-6 sm:mt-9">
+              <div class="grid grid-cols-2 gap-4">
                 <div>
-
-                    <div
-
-                        class="inline-flex items-center gap-2 border border-[#44d78e]/20 bg-[#44d78e]/10 px-3 py-1.5"
-
-                    >
-
-                        <span
-
-                            class="h-2 w-2 rounded-full bg-[#44d78e]"
-
-                        ></span>
-
-
-
-                        <span
-
-                            class="text-[10px] font-bold uppercase tracking-[0.15em] text-[#44d78e]"
-
-                        >
-
-                            Hasil tersedia
-
-                        </span>
-
-                    </div>
-
-
-
-                    <h2
-
-                        class="mt-5 text-3xl font-bold tracking-tight text-[#FFFFFF] sm:text-4xl"
-
-                    >
-
-                        Hasil Voting
-
-                    </h2>
-
-
-
-                    <p
-
-                        class="mt-2 text-sm leading-6 text-[#a39dbf]"
-
-                    >
-
-                        Rekapitulasi seluruh suara yang masuk.
-
-                    </p>
-
+                  <p class="text-3xl font-semibold tabular-nums sm:text-4xl">
+                    {getRoundedPercentage(selectedCandidate.voteCount)}%
+                  </p>
+                  <p class="mt-1 text-xs text-[#a39dbf]">
+                    Perolehan suara
+                  </p>
                 </div>
 
-
-
-                <div
-
-                    class="border border-[#514b70] bg-[#2d284b] px-6 py-4"
-
-                >
-
-                    <p
-
-                        class="text-[10px] font-bold uppercase tracking-[0.15em] text-[#c7c2df]"
-
-                    >
-
-                        Total Suara
-
-                    </p>
-
-
-
-                    <p
-
-                        class="mt-1 text-3xl font-bold tabular-nums text-[#FFFFFF]"
-
-                    >
-
-                        {data.totalVotes}
-
-                    </p>
-
+                <div class="border-l border-white/10">
+                  <p class="text-3xl font-semibold tabular-nums sm:text-4xl">
+                    {selectedCandidate.voteCount}
+                  </p>
+                  <p class="mt-1 text-xs text-[#a39dbf]">
+                    Total suara
+                  </p>
                 </div>
-
+              </div>
             </div>
+          </div>
+        </section>
 
+        <!-- Distribusi suara -->
+        <section class="mt-12 sm:mt-16">
+          <div class="text-center">
+            <h2 class="text-xl font-semibold sm:text-2xl">
+              Distribusi Suara
+            </h2>
 
+            <p class="mt-2 text-sm leading-6 text-[#a39dbf]">
+              Perbandingan perolehan suara seluruh pasangan calon.
+            </p>
+          </div>
 
-            {#if sortedResults.length === 0}
+          <div
+            class="mt-7 rounded-2xl border border-white/10 bg-[#2d284b] p-5 sm:mt-9 sm:p-8"
+          >
+            {#if data.totalVotes > 0 && pieSlices.length > 0}
+              <div class="relative mx-auto aspect-square w-full max-w-[300px]">
+                <svg
+                  viewBox="0 0 140 140"
+                  class="h-full w-full"
+                  role="img"
+                  aria-label="Diagram pie distribusi suara"
+                >
+                  <circle
+                    cx="70"
+                    cy="70"
+                    r="58"
+                    fill="#343052"
+                  />
 
+                  {#each pieSlices as slice (slice.candidate.id)}
+                    <path
+                      d={slice.path}
+                      fill={slice.color}
+                      stroke="#2d284b"
+                      stroke-width="1"
+                    />
+                  {/each}
+                </svg>
 
                 <div
-
-                    class="mt-10 border border-dashed border-[#514b70] bg-[#2d284b] px-6 py-20 text-center"
-
+                  class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center"
                 >
+                  <p
+                    class="text-4xl font-semibold tracking-tight tabular-nums"
+                  >
+                    {data.totalVotes}
+                  </p>
 
-                    <div
+                  <p
+                    class="mt-1 text-[10px] uppercase tracking-[0.16em] text-[#a39dbf]"
+                  >
+                    Total suara
+                  </p>
+                </div>
+              </div>
 
-                        class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[#242044] text-[#c7c2df]"
+              <!-- Legenda pie -->
+              <div class="mx-auto mt-8 max-w-2xl divide-y divide-white/[0.07]">
+                {#each pieSlices as slice (slice.candidate.id)}
+                  <div class="flex items-center gap-3 py-4">
+                    <span
+                      class="h-3 w-3 shrink-0 rounded-sm"
+                      style={`background-color: ${slice.color}`}
+                    ></span>
 
-                    >
+                    <div class="min-w-0 flex-1">
+                      <p class="break-words text-sm font-medium leading-5">
+                        {slice.candidate.ketuaName}
+                        <span class="text-[#a39dbf]">&</span>
+                        {slice.candidate.wakilName}
+                      </p>
 
-                        <svg
-
-                            xmlns="http://www.w3.org/2000/svg"
-
-                            viewBox="0 0 24 24"
-
-                            fill="none"
-
-                            stroke="currentColor"
-
-                            stroke-width="1.8"
-
-                            class="h-7 w-7"
-
-                        >
-
-                            <path
-
-                                stroke-linecap="round"
-
-                                stroke-linejoin="round"
-
-                                d="M4 19V5m0 14h16M8 16v-5m4 5V7m4 9v-8"
-
-                            />
-
-                        </svg>
-
+                      <p class="mt-1 text-xs text-[#a39dbf]">
+                        {slice.candidate.voteCount} suara
+                      </p>
                     </div>
 
-
-
-                    <h3
-
-                        class="mt-5 text-lg font-bold text-[#FFFFFF]"
-
-                    >
-
-                        Belum ada suara
-
-                    </h3>
-
-
-
                     <p
-
-                        class="mx-auto mt-2 max-w-md text-sm leading-6 text-[#a39dbf]"
-
+                      class="shrink-0 text-sm font-semibold tabular-nums"
+                      style={`color: ${slice.color}`}
                     >
-
-                        Belum ada pemilih yang memberikan suara.
-
+                      {getRoundedPercentage(slice.candidate.voteCount)}%
                     </p>
-
-                </div>
-
+                  </div>
+                {/each}
+              </div>
             {:else}
-
-
-                {#if selectedCandidate}
-
-                    <section
-
-                        class="mt-10 border border-[#a78bfa]/30 bg-[#2d284b] p-6 text-center sm:p-8"
-
-                    >
-
-                        <p
-
-                            class="text-[10px] font-bold uppercase tracking-[0.25em] text-[#a78bfa]"
-
-                        >
-
-                            Kandidat Terpilih
-
-                        </p>
-
-
-
-                        <div
-
-                            class="mt-6 flex flex-col items-center"
-
-                        >
-
-                            <div class="flex -space-x-3">
-
-                                <div
-
-                                    class="h-20 w-20 overflow-hidden rounded-2xl border-4 border-[#2d284b] bg-[#242044] ring-1 ring-[#a78bfa]/30"
-
-                                >
-
-                                    {#if selectedCandidate.ketuaPhotoUrl}
-
-                                        <img
-
-                                            src={selectedCandidate.ketuaPhotoUrl}
-
-                                            alt={selectedCandidate.ketuaName}
-
-                                            class="h-full w-full object-cover"
-
-                                        />
-
-                                    {:else}
-
-                                        <div
-
-                                            class="flex h-full w-full items-center justify-center text-[#c7c2df]"
-
-                                        >
-
-                                            <svg
-
-                                                xmlns="http://www.w3.org/2000/svg"
-
-                                                viewBox="0 0 24 24"
-
-                                                fill="none"
-
-                                                stroke="currentColor"
-
-                                                stroke-width="1.5"
-
-                                                class="h-8 w-8"
-
-                                            >
-
-                                                <circle
-
-                                                    cx="9"
-
-                                                    cy="8"
-
-                                                    r="3"
-
-                                                />
-
-
-
-                                                <path
-
-                                                    stroke-linecap="round"
-
-                                                    d="M3 20a6 6 0 0 1 12 0"
-
-                                                />
-
-                                            </svg>
-
-                                        </div>
-
-                                    {/if}
-
-                                </div>
-
-
-
-                                <div
-
-                                    class="h-20 w-20 overflow-hidden rounded-2xl border-4 border-[#2d284b] bg-[#242044] ring-1 ring-[#a78bfa]/30"
-
-                                >
-
-                                    {#if selectedCandidate.wakilPhotoUrl}
-
-                                        <img
-
-                                            src={selectedCandidate.wakilPhotoUrl}
-
-                                            alt={selectedCandidate.wakilName}
-
-                                            class="h-full w-full object-cover"
-
-                                        />
-
-                                    {:else}
-
-                                        <div
-
-                                            class="flex h-full w-full items-center justify-center text-[#c7c2df]"
-
-                                        >
-
-                                            <svg
-
-                                                xmlns="http://www.w3.org/2000/svg"
-
-                                                viewBox="0 0 24 24"
-
-                                                fill="none"
-
-                                                stroke="currentColor"
-
-                                                stroke-width="1.5"
-
-                                                class="h-8 w-8"
-
-                                            >
-
-                                                <circle
-
-                                                    cx="9"
-
-                                                    cy="8"
-
-                                                    r="3"
-
-                                                />
-
-
-
-                                                <path
-
-                                                    stroke-linecap="round"
-
-                                                    d="M3 20a6 6 0 0 1 12 0"
-
-                                                />
-
-                                            </svg>
-
-                                        </div>
-
-                                    {/if}
-
-                                </div>
-
-                            </div>
-
-
-
-                            <h3
-
-                                class="mt-6 text-2xl font-bold tracking-tight text-[#FFFFFF] sm:text-3xl"
-
-                            >
-
-                                {selectedCandidate.ketuaName}
-
-                            </h3>
-
-
-
-                            <div
-
-                                class="my-2 text-sm text-[#c7c2df]"
-
-                            >
-
-                                &
-
-                            </div>
-
-
-
-                            <h4
-
-                                class="text-xl font-semibold text-[#a78bfa] sm:text-2xl"
-
-                            >
-
-                                {selectedCandidate.wakilName}
-
-                            </h4>
-
-
-
-                            <div
-
-                                class="mt-5 flex items-center gap-3"
-
-                            >
-
-                                <span
-
-                                    class="border border-[#a78bfa]/30 bg-[#a78bfa]/10 px-3 py-1.5 text-xs font-bold text-[#a78bfa]"
-
-                                >
-
-                                    {selectedCandidate.voteCount}
-
-                                    suara
-
-                                </span>
-
-
-
-                                <span
-
-                                    class="border border-[#514b70] bg-[#242044] px-3 py-1.5 text-xs font-bold text-[#a39dbf]"
-
-                                >
-
-                                    {getRoundedPercentage(
-
-                                        selectedCandidate.voteCount
-
-                                    )}%
-
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                    </section>
-
-                {/if}
-
-
-                <section
-
-                    class="mt-6 border border-[#514b70] bg-[#2d284b] p-6 sm:p-10"
-
-                >
-
-                    <div class="text-center">
-
-                        <p
-
-                            class="text-[10px] font-bold uppercase tracking-[0.2em] text-[#c7c2df]"
-
-                        >
-
-                            Distribusi Suara
-
-                        </p>
-
-
-
-                        <h3
-
-                            class="mt-2 text-xl font-semibold text-[#FFFFFF]"
-
-                        >
-
-                            Seluruh Pasangan Calon
-
-                        </h3>
-
-                    </div>
-
-
-
-                    <div
-
-                        class="mt-8 flex flex-col items-center"
-
-                    >
-
-
-                        <div
-
-                            class="relative h-72 w-72 sm:h-80 sm:w-80"
-
-                        >
-
-                            <svg
-
-                                class="h-full w-full"
-
-                                viewBox="0 0 140 140"
-
-                                fill="none"
-
-                            >
-
-                                <circle
-
-                                    cx="70"
-
-                                    cy="70"
-
-                                    r="58"
-
-                                    fill="#343052"
-
-                                />
-
-
-
-                                {#each pieSlices as slice (slice.candidate.id)}
-
-                                    <path
-
-                                        d={slice.path}
-
-                                        fill={slice.color}
-
-                                        stroke="#FFFFFF"
-
-                                        stroke-width="1.5"
-
-                                        class="transition-opacity duration-300 hover:opacity-80"
-
-                                    />
-
-                                {/each}
-
-                            </svg>
-
-
-
-                            <div
-
-                                class="absolute inset-0 flex flex-col items-center justify-center"
-
-                            >
-
-                                <p
-
-                                    class="text-4xl font-bold tabular-nums tracking-tight text-[#FFFFFF]"
-
-                                >
-
-                                    {data.totalVotes}
-
-                                </p>
-
-
-
-                                <p
-
-                                    class="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#c7c2df]"
-
-                                >
-
-                                    Total suara
-
-                                </p>
-
-                            </div>
-
-                        </div>
-
-
-
-         
-
-
-
-                        <div
-
-                            class="mt-10 grid w-full max-w-2xl gap-3 sm:grid-cols-2"
-
-                        >
-
-                            {#each pieSlices as slice (slice.candidate.id)}
-
-                                <div
-
-                                    class={`border p-4 ${
-
-                                        slice.index === 0
-
-                                            ? "border-[#a78bfa]/30 bg-[#a78bfa]/5"
-
-                                            : "border-[#514b70] bg-[#242044]"
-
-                                    }`}
-
-                                >
-
-                                    <div
-
-                                        class="flex items-start gap-3"
-
-                                    >
-
-                                        <div
-
-                                            class="mt-1.5 h-3 w-3 shrink-0 rounded-sm"
-
-                                            style={`background-color: ${slice.color}`}
-
-                                        ></div>
-
-
-
-                                        <div
-
-                                            class="min-w-0 flex-1"
-
-                                        >
-
-                                            <div
-
-                                                class="flex items-start justify-between gap-3"
-
-                                            >
-
-                                                <div>
-
-                                                    <p
-
-                                                        class="text-[10px] font-bold uppercase tracking-[0.12em] text-[#c7c2df]"
-
-                                                    >
-
-                                                        Pasangan {String(
-
-                                                            slice.index + 1
-
-                                                        ).padStart(
-
-                                                            2,
-
-                                                            "0"
-
-                                                        )}
-
-                                                    </p>
-
-
-
-                                                    <p
-
-                                                        class="mt-1 text-sm font-semibold leading-5 text-[#FFFFFF]"
-
-                                                    >
-
-                                                        {slice.candidate.ketuaName}
-
-
-
-                                                        <span
-
-                                                            class="font-normal text-[#c7c2df]"
-
-                                                        >
-
-                                                            &
-
-                                                        </span>
-
-
-
-                                                        {slice.candidate.wakilName}
-
-                                                    </p>
-
-                                                </div>
-
-
-
-                                                {#if slice.index === 0}
-
-                                                    <span
-
-                                                        class="shrink-0 border border-[#a78bfa]/30 bg-[#a78bfa]/10 px-2 py-1 text-[9px] font-bold uppercase tracking-wide text-[#a78bfa]"
-
-                                                    >
-
-                                                        Terbanyak
-
-                                                    </span>
-
-                                                {/if}
-
-                                            </div>
-
-
-
-                                            <div
-
-                                                class="mt-3 flex items-center justify-between"
-
-                                            >
-
-                                                <span
-
-                                                    class="text-xs text-[#c7c2df]"
-
-                                                >
-
-                                                    {slice.candidate.voteCount}
-
-                                                    suara
-
-                                                </span>
-
-
-
-                                                <span
-
-                                                    class="text-sm font-bold tabular-nums"
-
-                                                    style={`color: ${slice.color}`}
-
-                                                >
-
-                                                    {getRoundedPercentage(
-
-                                                        slice.candidate.voteCount
-
-                                                    )}%
-
-                                                </span>
-
-                                            </div>
-
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-                            {/each}
-
-                        </div>
-
-                    </div>
-
-                </section>
-
-
-
-        
-
-
-
-                <section class="mt-8">
-
-                    <div class="mb-4">
-
-                        <p
-
-                            class="text-[10px] font-bold uppercase tracking-[0.2em] text-[#c7c2df]"
-
-                        >
-
-                            Perolehan Suara
-
-                        </p>
-
-
-
-                        <h3
-
-                            class="mt-1 text-lg font-semibold text-[#FFFFFF]"
-
-                        >
-
-                            Daftar Pasangan Calon
-
-                        </h3>
-
-                    </div>
-
-
-
-                    <div class="space-y-3">
-
-                        {#each sortedResults as candidate, index (candidate.id)}
-
-                            {@const percentage = getRoundedPercentage(
-
-                                candidate.voteCount
-
-                            )}
-
-
-
-                            <article
-
-                                class={`border bg-[#2d284b] p-4 sm:p-5 ${
-
-                                    index === 0
-
-                                        ? "border-[#a78bfa]/40"
-
-                                        : "border-[#514b70]"
-
-                                }`}
-
-                            >
-
-                                <div
-
-                                    class="flex flex-col gap-4 sm:flex-row sm:items-center"
-
-                                >
-
-
-                                    <div
-
-                                        class={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-xs font-bold ${
-
-                                            index === 0
-
-                                                ? "bg-[#a78bfa] text-[#242044]"
-
-                                                : "bg-[#242044] text-[#c7c2df]"
-
-                                        }`}
-
-                                    >
-
-                                        #{index + 1}
-
-                                    </div>
-
-
-
-
-                                    <div
-
-                                        class="flex shrink-0 -space-x-2"
-
-                                    >
-
-                                        <div
-
-                                            class="h-12 w-12 overflow-hidden rounded-xl border-2 border-[#FFFFFF] bg-[#242044]"
-
-                                        >
-
-                                            {#if candidate.ketuaPhotoUrl}
-
-                                                <img
-
-                                                    src={candidate.ketuaPhotoUrl}
-
-                                                    alt={candidate.ketuaName}
-
-                                                    class="h-full w-full object-cover"
-
-                                                />
-
-                                            {:else}
-
-                                                <div
-
-                                                    class="flex h-full w-full items-center justify-center text-[#c7c2df]"
-
-                                                >
-
-                                                    <svg
-
-                                                        xmlns="http://www.w3.org/2000/svg"
-
-                                                        viewBox="0 0 24 24"
-
-                                                        fill="none"
-
-                                                        stroke="currentColor"
-
-                                                        stroke-width="1.5"
-
-                                                        class="h-5 w-5"
-
-                                                    >
-
-                                                        <circle
-
-                                                            cx="9"
-
-                                                            cy="8"
-
-                                                            r="3"
-
-                                                        />
-
-
-
-                                                        <path
-
-                                                            stroke-linecap="round"
-
-                                                            d="M3 20a6 6 0 0 1 12 0"
-
-                                                        />
-
-                                                    </svg>
-
-                                                </div>
-
-                                            {/if}
-
-                                        </div>
-
-
-
-                                        <div
-
-                                            class="h-12 w-12 overflow-hidden rounded-xl border-2 border-[#FFFFFF] bg-[#242044]"
-
-                                        >
-
-                                            {#if candidate.wakilPhotoUrl}
-
-                                                <img
-
-                                                    src={candidate.wakilPhotoUrl}
-
-                                                    alt={candidate.wakilName}
-
-                                                    class="h-full w-full object-cover"
-
-                                                />
-
-                                            {:else}
-
-                                                <div
-
-                                                    class="flex h-full w-full items-center justify-center text-[#c7c2df]"
-
-                                                >
-
-                                                    <svg
-
-                                                        xmlns="http://www.w3.org/2000/svg"
-
-                                                        viewBox="0 0 24 24"
-
-                                                        fill="none"
-
-                                                        stroke="currentColor"
-
-                                                        stroke-width="1.5"
-
-                                                        class="h-5 w-5"
-
-                                                    >
-
-                                                        <circle
-
-                                                            cx="9"
-
-                                                            cy="8"
-
-                                                            r="3"
-
-                                                        />
-
-
-
-                                                        <path
-
-                                                            stroke-linecap="round"
-
-                                                            d="M3 20a6 6 0 0 1 12 0"
-
-                                                        />
-
-                                                    </svg>
-
-                                                </div>
-
-                                            {/if}
-
-                                        </div>
-
-                                    </div>
-
-
-
-
-                                    <div class="min-w-0 flex-1">
-
-                                        <div
-
-                                            class="flex flex-wrap items-center gap-2"
-
-                                        >
-
-                                            <p
-
-                                                class="text-[10px] font-bold uppercase tracking-[0.15em] text-[#c7c2df]"
-
-                                            >
-
-                                                Pasangan {String(
-
-                                                    index + 1
-
-                                                ).padStart(2, "0")}
-
-                                            </p>
-
-
-
-                                            {#if index === 0}
-
-                                                <span
-
-                                                    class="border border-[#a78bfa]/30 bg-[#a78bfa]/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-[#a78bfa]"
-
-                                                >
-
-                                                    Terbanyak
-
-                                                </span>
-
-                                            {/if}
-
-                                        </div>
-
-
-
-                                        <h4
-
-                                            class="mt-1 truncate text-sm font-semibold text-[#FFFFFF] sm:text-base"
-
-                                        >
-
-                                            {candidate.ketuaName}
-
-
-
-                                            <span
-
-                                                class="font-normal text-[#c7c2df]"
-
-                                            >
-
-                                                &
-
-                                            </span>
-
-
-
-                                            {candidate.wakilName}
-
-                                        </h4>
-
-                                    </div>
-
-
-
-
-                                    <div
-
-                                        class="flex items-center gap-5 sm:justify-end"
-
-                                    >
-
-                                        <div
-
-                                            class="text-left sm:text-right"
-
-                                        >
-
-                                            <p
-
-                                                class="text-xl font-bold tabular-nums text-[#FFFFFF]"
-
-                                            >
-
-                                                {candidate.voteCount}
-
-                                            </p>
-
-
-
-                                            <p
-
-                                                class="text-[9px] font-bold uppercase tracking-[0.15em] text-[#c7c2df]"
-
-                                            >
-
-                                                suara
-
-                                            </p>
-
-                                        </div>
-
-
-
-                                        <div
-
-                                            class="min-w-[50px] text-right"
-
-                                        >
-
-                                            <p
-
-                                                class="text-lg font-bold tabular-nums"
-
-                                                style={`color: ${
-
-                                                    pieColors[
-
-                                                        index %
-
-                                                            pieColors.length
-
-                                                    ]
-
-                                                }`}
-
-                                            >
-
-                                                {percentage}%
-
-                                            </p>
-
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-                            </article>
-
-                        {/each}
-
-                    </div>
-
-                </section>
-
-
-
-
-                <div
-
-                    class="mt-8 border border-[#514b70] bg-[#2d284b] px-5 py-4 text-center"
-
-                >
-
-                    <p
-
-                        class="text-xs leading-5 text-[#c7c2df]"
-
-                    >
-
-                        Hasil ini menampilkan jumlah suara yang
-
-                        tercatat di dalam sistem.
-
-                    </p>
-
-                </div>
-
+              <p class="py-12 text-center text-sm text-[#a39dbf]">
+                Belum ada suara yang tercatat.
+              </p>
             {/if}
+          </div>
+        </section>
 
-        </main>
+        <p class="mx-auto mt-8 max-w-lg text-center text-xs leading-5 text-[#85859f]">
+          Hasil ditampilkan berdasarkan jumlah suara yang tercatat di dalam
+          sistem.
+        </p>
+      {:else}
+        <section class="py-20 text-center">
+          <h1 class="text-2xl font-semibold">
+            Belum ada hasil pemilihan
+          </h1>
 
-    {/if}
+          <p class="mt-3 text-sm leading-6 text-[#a39dbf]">
+            Belum ada pasangan calon atau suara yang tercatat di dalam sistem.
+          </p>
 
+          <a
+            href="/admin"
+            class="mt-6 inline-flex rounded-md bg-[#c5b8d6] px-4 py-2.5 text-sm font-semibold text-[#242044] transition hover:bg-[#d8cde5]"
+          >
+            Kembali ke admin
+          </a>
+        </section>
+      {/if}
+    </main>
+  {/if}
 </div>
