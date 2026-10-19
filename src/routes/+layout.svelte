@@ -1,6 +1,5 @@
 <script lang="ts">
   import './layout.css';
-  import favicon from '#lib/assets/favicon.svg';
 
   import { page } from '$app/state';
   import Header from '#lib/components/Header.svelte';
@@ -14,7 +13,7 @@
 </script>
 
 <svelte:head>
-  <link rel="icon" href={"/images/logo.jpg"} />
+  <link rel="icon" href="/images/logo.jpg" />
   <meta name="theme-color" content="#11152e" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />

@@ -2,20 +2,14 @@
 	let { data, form } = $props();
 
 	type Candidate = {
-		id: string;
-
-		ketuaName: string;
-
-		wakilName: string;
-
-		ketuaPhotoUrl?: string | null;
-
-		wakilPhotoUrl?: string | null;
-
-		vision: string;
-
-		mission: string;
-	};
+  id: string;
+  ketuaName: string;
+  ketuaPhotoUrl: string | null;
+  wakilName: string;
+  wakilPhotoUrl: string | null;
+  vision: string | null;
+  mission: string | null;
+};
 
 	let showCreateForm = $state(false);
 
