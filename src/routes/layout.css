@@ -1,0 +1,140 @@
+
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Fredoka:wght@400;500;600;700&display=swap");
+@import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+
+  /* Core */
+  --background: #242044;
+  --surface: #2d284b;
+  --surface-raised: #343052;
+  --surface-hover: #403a61;
+
+  /* Brand */
+  --primary: #a78bfa;
+  --secondary: #8a7fa6;
+  --accent: #ffd83d;
+
+  /* Ten cohort groups */
+  --noctis: #9564d9;
+  --valor: #e83f69;
+  --melankara: #3979d7;
+  --resolve: #ff7950;
+  --bingbong: #986c79;
+  --rubora: #f23a9e;
+  --tranquil: #e2d4f2;
+  --aversa: #44d78e;
+  --euphoria: #f7bd43;
+  --aspire: #40a7ef;
+
+  /* Text */
+  --white: #ffffff;
+  --muted: #c7c2df;
+  --subtle: #a39dbf;
+
+  /* Borders and focus */
+  --border: #514b70;
+  --border-subtle: rgb(255 255 255 / 10%);
+  --focus: #70b9f5;
+
+  /* Typography */
+  font-family: "DM Sans", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+html {
+  min-width: 320px;
+  min-height: 100%;
+  background: var(--background);
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background: var(--background);
+  color: var(--white);
+  font-family: "DM Sans", sans-serif;
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+.display-font {
+  font-family: "Fredoka", sans-serif;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--subtle);
+  opacity: 1;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--background);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--border);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary);
+}
+
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.8);
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
