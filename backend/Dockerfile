@@ -1,4 +1,4 @@
-FROM golang:1.25-alpine AS builder
+FROM golang:1.26-alpine AS builder
 
 WORKDIR /app
 
@@ -9,7 +9,6 @@ RUN go mod download
 
 COPY . .
 
-# Ganti ./cmd/server dengan lokasi package main backend kamu.
 ARG MAIN_PACKAGE=.
 RUN CGO_ENABLED=0 GOOS=linux go build \
     -trimpath \
@@ -27,6 +26,7 @@ WORKDIR /app
 COPY --from=builder /app/server ./server
 
 ENV TZ=Asia/Jakarta
+
 USER app
 
 EXPOSE 8080
