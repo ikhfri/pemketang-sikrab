@@ -150,20 +150,7 @@
           <div
             class="absolute inset-[-12%] -z-10 rounded-full bg-[#9564d9]/20 blur-[26px]"
           ></div>
-
-          <div class="flex flex-col items-center justify-center">
-            <span
-              class="mb-px text-[7px] md:text-[10px] font-extrabold tracking-[0.24em] text-[#bcb1d9]"
-            >
-              ANGKATAN
-            </span>
-            <span
-              class="text-5xl sm:text-6xl md:text-7xl lg:text-[84px] font-extrabold leading-[1.1] tracking-[-0.09em] text-[#fbf9ff] drop-shadow-[0_5px_28px_rgb(201_181_255/15%)]"
-            >
-              63
-            </span>
-           
-          </div>
+          <img src="/images/logo.jpg" alt="" class="w-full h-full object-cover rounded-full" />
         </div>
       </div>
 
