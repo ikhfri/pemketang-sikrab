@@ -79,7 +79,7 @@
 
     <!-- Login -->
     <section
-      class="mx-auto w-full max-w-[420px] min-w-0 md:justify-self-end"
+      class="mx-auto w-full max-w-105 min-w-0 md:justify-self-end"
     >
       <div class="mb-8 sm:mb-9">
         <h2
@@ -227,7 +227,7 @@
                 ? 'Sembunyikan kata sandi'
                 : 'Tampilkan kata sandi'}
               aria-pressed={showPassword}
-              class="absolute inset-y-0 right-0 grid w-12 place-items-center rounded-r-lg text-[#b8b5c5] transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-[#c5b8d6]"
+              class="absolute inset-y-0 right-0 grid w-12 place-items-center rounded-r-lg text-[#b8b5c5] transition-colors hover:text-white focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-[#c5b8d6]"
             >
               {#if showPassword}
                 <!-- Eye off -->

@@ -124,9 +124,9 @@
 	/><meta name="theme-color" content="#242044" /></svelte:head
 >
 <div class="min-h-screen bg-[#242044] text-[#f4f2fb] selection:bg-violet-300/30">
-	<header class="sticky top-0 z-40 border-b border-white/[0.08] bg-[#242044]/90 backdrop-blur-xl">
+	<header class="sticky top-0 z-40 border-b border-white/8 bg-[#242044]/90 backdrop-blur-xl">
 		<div
-			class="mx-auto flex min-h-[72px] max-w-[1440px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-10"
+			class="mx-auto flex min-h-18 max-w-360 items-center justify-between gap-4 px-4 sm:px-6 lg:px-10"
 		>
 			<a href="/admin" class="flex items-center gap-3"
 				><img
@@ -151,18 +151,18 @@
 				</div>
 				<form method="POST" action="/logout">
 					<button
-						class="rounded-lg border border-white/10 px-3 py-2 text-sm text-[#c7c4d5] hover:bg-white/[0.05]"
+						class="rounded-lg border border-white/10 px-3 py-2 text-sm text-[#c7c4d5] hover:bg-white/5"
 						type="submit">Keluar</button
 					>
 				</form>
 			</div>
 		</div>
 	</header>
-	<main class="mx-auto max-w-[1440px] px-4 py-7 sm:px-6 sm:py-9 lg:px-10">
+	<main class="mx-auto max-w-360 px-4 py-7 sm:px-6 sm:py-9 lg:px-10">
 		<section class="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
 			<div>
 				<p class="mb-3 text-xs font-semibold tracking-[0.2em] text-[#a78bfa] uppercase">
-					Control center
+					IHSG 4 RIBU CUY, OTW PINDAH NEGARA
 				</p>
 				<h1 class="text-3xl font-semibold tracking-tight sm:text-4xl">Dashboard voting</h1>
 				<p class="mt-3 max-w-2xl text-sm leading-6 text-[#c4bddb]">
@@ -187,12 +187,12 @@
 				{form.error}
 			</div>{/if}
 		<section class="mb-8 grid gap-4 md:grid-cols-3" aria-label="Ringkasan voting">
-			<article class="rounded-2xl border border-white/[0.08] bg-[#2d284b] p-5 sm:p-6">
+			<article class="rounded-2xl border border-white/8 bg-[#2d284b] p-5 sm:p-6">
 				<p class="text-sm text-[#c4bddb]">Total pemilih</p>
 				<p class="mt-5 text-4xl font-semibold tabular-nums">{data.totalVoters ?? 0}</p>
 				<p class="mt-2 text-xs text-[#a99fc5]">Pemilih terdaftar di sistem</p>
 			</article>
-			<article class="rounded-2xl border border-white/[0.08] bg-[#2d284b] p-5 sm:p-6">
+			<article class="rounded-2xl border border-white/8 bg-[#2d284b] p-5 sm:p-6">
 				<div class="flex justify-between">
 					<p class="text-sm text-[#c4bddb]">Sudah memilih</p>
 					<span class="rounded-lg bg-emerald-300/10 px-2.5 py-1.5 text-xs text-emerald-200"
@@ -201,7 +201,7 @@
 				</div>
 				<p class="mt-5 text-4xl font-semibold tabular-nums">{data.votedCount ?? 0}</p>
 				<div
-					class="mt-3 h-1.5 overflow-hidden rounded-full bg-white/[0.08]"
+					class="mt-3 h-1.5 overflow-hidden rounded-full bg-white/8"
 					role="progressbar"
 					aria-label="Partisipasi voting"
 					aria-valuemin="0"
@@ -212,7 +212,7 @@
 				</div>
 				<p class="mt-2 text-xs text-[#a99fc5]">{data.notVotedCount ?? 0} pemilih belum vote</p>
 			</article>
-			<article class="rounded-2xl border border-white/[0.08] bg-[#2d284b] p-5 sm:p-6">
+			<article class="rounded-2xl border border-white/8 bg-[#2d284b] p-5 sm:p-6">
 				<div class="flex flex-wrap items-center justify-between gap-2">
 					<p class="text-sm text-[#c4bddb]">Status voting</p>
 					<span
@@ -231,9 +231,9 @@
 				<p class="mt-2 text-xs leading-5 text-[#a99fc5]">{votingStatus.description}</p>
 			</article>
 		</section>
-		<section class="mb-8 overflow-hidden rounded-2xl border border-white/[0.08] bg-[#2d284b]">
+		<section class="mb-8 overflow-hidden rounded-2xl border border-white/8 bg-[#2d284b]">
 			<div
-				class="flex flex-col justify-between gap-3 border-b border-white/[0.07] px-5 py-5 sm:flex-row sm:items-center sm:px-6"
+				class="flex flex-col justify-between gap-3 border-b border-white/7 px-5 py-5 sm:flex-row sm:items-center sm:px-6"
 			>
 				<div>
 					<h2 class="font-semibold">Daftar pemilih</h2>
@@ -267,8 +267,8 @@
 				>
 			</div>
 			<div class="overflow-x-auto">
-				<table class="w-full min-w-[700px] text-left text-sm">
-					<thead class="bg-white/[0.025] text-xs text-[#a99fc5]"
+				<table class="w-full min-w-175 text-left text-sm">
+					<thead class="bg-white/2.5 text-xs text-[#a99fc5]"
 						><tr
 							><th class="px-5 py-3.5 font-medium sm:px-6">Nama pemilih</th><th
 								class="px-5 py-3.5 font-medium">Kelompok</th
@@ -276,8 +276,8 @@
 								>Status</th
 							></tr
 						></thead
-					><tbody class="divide-y divide-white/[0.06]"
-						>{#each filteredVoters as voter (voter.id)}<tr class="hover:bg-white/[0.025]"
+					><tbody class="divide-y divide-white/6"
+						>{#each filteredVoters as voter (voter.id)}<tr class="hover:bg-white/2.5"
 								><td class="px-5 py-4 font-medium sm:px-6">{voter.name ?? 'Nama belum diatur'}</td
 								><td class="px-5 py-4"
 									>{#if voter.kelompok}<span
@@ -305,7 +305,7 @@
 					?.length ?? 0} pemilih
 			</div>
 		</section>
-		<section class="mb-8 overflow-hidden rounded-2xl border border-white/[0.08] bg-[#2d284b]">
+		<section class="mb-8 overflow-hidden rounded-2xl border border-white/8 bg-[#2d284b]">
 			<div class="border-b border-white/[0.07] px-5 py-5 sm:px-6">
 				<h2 class="font-semibold">Pengaturan voting</h2>
 				<p class="mt-1 text-sm text-[#b3a9ce]">Tentukan waktu mulai dan berakhirnya pemilihan.</p>
@@ -351,7 +351,7 @@
 				</div>
 			</form>
 		</section>
-		<section class="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#2d284b]">
+		<section class="overflow-hidden rounded-2xl border border-white/8 bg-[#2d284b]">
 			<div
 				class="flex flex-col justify-between gap-4 border-b border-white/[0.07] px-5 py-5 sm:flex-row sm:items-center sm:px-6"
 			>
@@ -532,7 +532,7 @@
 											<button
 												type="button"
 												onclick={() => startEdit(candidate)}
-												class="rounded-lg border border-white/10 px-3 py-2 text-sm hover:bg-white/[0.05]"
+												class="rounded-lg border border-white/10 px-3 py-2 text-sm hover:bg-white/5"
 												>Edit</button
 											><button
 												type="button"
@@ -543,7 +543,7 @@
 										</div>
 									</div>
 									{#if deleteCandidateId === candidate.id}<div
-											class="flex flex-col justify-between gap-3 rounded-xl border border-rose-300/20 bg-rose-300/[0.06] p-4 sm:flex-row sm:items-center"
+											class="flex flex-col justify-between gap-3 rounded-xl border border-rose-300/20 bg-rose-300/6 p-4 sm:flex-row sm:items-center"
 										>
 											<p class="text-sm">Yakin ingin menghapus pasangan ini?</p>
 											<div class="flex gap-2">

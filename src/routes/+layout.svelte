@@ -29,7 +29,7 @@
 </svelte:head>
 
 <div
-  class="flex min-h-screen min-h-[100svh] flex-col bg-[#11152e] font-['DM_Sans'] text-[#f7f5fa] antialiased"
+  class="flex min-h-svh flex-col bg-[#11152e] font-['DM_Sans'] text-[#f7f5fa] antialiased"
 >
   {#if !isAdmin}
     <Header />

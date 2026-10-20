@@ -199,7 +199,7 @@
             <div class="grid grid-cols-2 gap-4 sm:gap-8">
               <div class="min-w-0">
                 <div
-                  class="mx-auto aspect-[4/5] w-full max-w-[220px] overflow-hidden rounded-xl bg-[#242044]"
+                  class="mx-auto aspect-4/5 w-full max-w-55 overflow-hidden rounded-xl bg-[#242044]"
                 >
                   {#if selectedCandidate.ketuaPhotoUrl}
                     <img
@@ -223,7 +223,7 @@
                 </p>
 
                 <h2
-                  class="mt-1 break-words text-sm leading-5 font-semibold sm:text-xl sm:leading-7"
+                  class="mt-1 wrap-break-word text-sm leading-5 font-semibold sm:text-xl sm:leading-7"
                 >
                   {selectedCandidate.ketuaName}
                 </h2>
@@ -231,7 +231,7 @@
 
               <div class="min-w-0">
                 <div
-                  class="mx-auto aspect-[4/5] w-full max-w-[220px] overflow-hidden rounded-xl bg-[#242044]"
+                  class="mx-auto aspect-4/5 w-full max-w-55 overflow-hidden rounded-xl bg-[#242044]"
                 >
                   {#if selectedCandidate.wakilPhotoUrl}
                     <img
@@ -255,7 +255,7 @@
                 </p>
 
                 <h2
-                  class="mt-1 break-words text-sm leading-5 font-semibold sm:text-xl sm:leading-7"
+                  class="mt-1 wrap-break-word text-sm leading-5 font-semibold sm:text-xl sm:leading-7"
                 >
                   {selectedCandidate.wakilName}
                 </h2>
@@ -302,7 +302,7 @@
             class="mt-7 rounded-2xl border border-white/10 bg-[#2d284b] p-5 sm:mt-9 sm:p-8"
           >
             {#if data.totalVotes > 0 && pieSlices.length > 0}
-              <div class="relative mx-auto aspect-square w-full max-w-[300px]">
+              <div class="relative mx-auto aspect-square w-full max-w-75">
                 <svg
                   viewBox="0 0 140 140"
                   class="h-full w-full"
@@ -353,7 +353,7 @@
                     ></span>
 
                     <div class="min-w-0 flex-1">
-                      <p class="break-words text-sm font-medium leading-5">
+                      <p class="wrap-break-word text-sm font-medium leading-5">
                         {slice.candidate.ketuaName}
                         <span class="text-[#a39dbf]">&</span>
                         {slice.candidate.wakilName}
