@@ -1,0 +1,20 @@
+services:
+  sikrabtek-frontend:
+    container_name: sikrabtek-frontend
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-https://voting.titiknol.site}
+    restart: unless-stopped
+    ports:
+      # Only accessible from the VPS itself; public traffic goes through host Nginx.
+      - "127.0.0.1:4173:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/ || exit 1"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    security_opt:
+      - no-new-privileges:true
