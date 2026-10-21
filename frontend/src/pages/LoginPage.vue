@@ -44,7 +44,7 @@ const errors = ref({
 
 onMounted(() => {
 
-  document.title = "Login — Pemketang";
+  document.title = "Login Mpruy";
 
   const updateMeta = (name: string, content: string) => {
 
@@ -228,35 +228,24 @@ async function handleSubmit() {
 
       <!-- Hero -->
 
-      <section class="hidden min-w-0 md:block md:py-2">
+    
+<section class="hidden min-w-0 md:block md:py-2">
+  <h1
+    class="m-0 text-4xl leading-[1.08] font-bold tracking-tighter text-[#fbf9ff] lg:text-6xl"
+  >
+    Your Voice.
+    <br />
+    <span class="text-[#c5b8d6]">Your Choice.</span>
+  </h1>
 
-        <h1
+  <p
+    class="mt-5 max-w-md text-sm leading-7 text-[#b8b5c5] lg:mt-6 lg:text-base"
+  >
+    Kenali setiap pilihan, tentukan siapa yang paling lo percaya,
+    dan jadi bagian dari langkah Angkatan 63 selanjutnya.
+  </p>
+</section>
 
-          class="m-0 text-4xl leading-[1.08] font-bold tracking-[-0.055em] lg:text-6xl"
-
-        >
-
-          Saatnya
-
-          <br />
-
-          <span class="text-[#c5b8d6]">menentukan.</span>
-
-        </h1>
-
-        <p
-
-          class="mt-6 max-w-md text-sm leading-7 text-[#b8b5c5] lg:text-base"
-
-        >
-
-          Kenali pilihan lo, tentukan siapa yang paling tepat, dan ikut
-
-          menentukan langkah Angkatan 63 ke depan.
-
-        </p>
-
-      </section>
 
       <!-- Login -->
 

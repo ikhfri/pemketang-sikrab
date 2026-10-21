@@ -64,38 +64,43 @@ onMounted(() => {
 
     <section class="landing-layout mx-auto grid h-full min-h-0 w-full max-w-310 grid-cols-1 items-center px-4 sm:px-6 md:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] md:gap-5 md:px-8 lg:gap-12 lg:px-12">
       <!-- Introduction -->
-      <div class="landing-intro flex min-w-0 flex-col items-start justify-center">
-        <div class="w-full max-w-127.5">
-          <p class="mb-3 text-[10px] font-bold uppercase tracking-[0.24em] text-[#a99acb] sm:text-xs">
-            Pemilihan Angkatan 63
-          </p>
+     
+<div class="landing-intro flex min-w-0 flex-col items-start justify-center">
+  <div class="w-full max-w-127.5">
 
-          <h1 class="m-0 text-[clamp(2rem,5.5vw,4.625rem)] font-extrabold leading-[1.04] tracking-[-0.075em] text-[#fbf9ff]">
-            Beda warna.
-            <br />
-            <span class="text-[#c9b5ff]">Satu suara.</span>
-          </h1>
+    <h1
+      class="m-0 text-[clamp(2.75rem,5.2vw,4.5rem)] font-bold leading-[1.08] tracking-[-0.055em] text-[#fbf9ff]"
+    >
+      The Next Chapter.
+      <br />
+      <span class="text-[#c9b5ff]">Starts With Us.</span>
+    </h1>
 
-          <p class="landing-description max-w-107.5 text-[13px] font-normal leading-[1.8] text-[#b8b2cc] sm:text-sm">
-            Sepuluh kelompok, banyak cerita, satu angkatan. Sekarang waktunya
-            menentukan siapa yang bakal membawa Angkatan 63 melangkah lebih jauh.
-          </p>
+    <p
+      class="landing-description mt-5 max-w-md text-sm leading-7 text-[#b8b2cc] sm:mt-6 sm:text-[15px]"
+    >
+      Setiap angkatan punya ceritanya sendiri. Sekarang, saatnya
+      menentukan siapa yang akan membawa Angkatan 63 ke babak
+      berikutnya.
+    </p>
 
-          <RouterLink
-            to="/login"
-            class="group inline-flex min-h-11 items-center justify-center gap-4 rounded-[14px] border border-white/12 bg-[#c9b5ff] pl-5 pr-4 text-xs font-extrabold text-[#242044] no-underline transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#d9caff] hover:shadow-[0_12px_35px_rgb(201_181_255/20%)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:min-h-12 sm:gap-5 md:min-h-13 md:pl-6 md:pr-5 md:text-[13px]"
-          >
-            <span>Mulai Vote Sekarang</span>
+    <RouterLink
+      to="/login"
+      class="group mt-7 inline-flex min-h-12 items-center justify-center gap-4 rounded-xl bg-[#c9b5ff] px-5 text-[13px] font-bold text-[#242044] no-underline transition-colors duration-200 hover:bg-[#d9caff] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:mt-8 sm:gap-5 sm:px-6"
+    >
+      <span>Mulai Vote Sekarang</span>
 
-            <span
-              class="grid h-7 w-7 place-items-center rounded-[9px] bg-[#242044]/10 text-lg transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-              aria-hidden="true"
-            >
-              ↗
-            </span>
-          </RouterLink>
-        </div>
-      </div>
+      <span
+        class="text-lg leading-none transition-transform duration-200 group-hover:translate-x-1"
+        aria-hidden="true"
+      >
+        →
+      </span>
+    </RouterLink>
+
+  </div>
+</div>
+
 
       <!-- Animated group orbit -->
       <div
