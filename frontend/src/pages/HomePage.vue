@@ -47,9 +47,11 @@ onMounted(() => {
 </script>
 
 <template>
+
 <main
-  class="landing-page relative isolate flex min-h-0 flex-1 w-full items-center justify-center overflow-hidden bg-[#242044] text-[#fbf9ff]"
->    <!-- Background -->
+  class="landing-page relative isolate flex w-full min-h-0 flex-1 items-center justify-center overflow-hidden bg-[#242044] text-[#fbf9ff]"
+>
+<!-- Background -->
     <div
       class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_75%_45%,rgb(99_73_145/17%)_0%,transparent_39%),radial-gradient(ellipse_at_10%_100%,rgb(91_68_132/13%)_0%,transparent_38%)]"
     />

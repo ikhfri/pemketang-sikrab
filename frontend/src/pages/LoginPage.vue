@@ -218,13 +218,16 @@ async function handleSubmit() {
 
 <template>
 
-  <main class="flex min-h-0 flex-1 items-center overflow-y-auto bg-[#242044] text-[#fbf9ff]">
 
-    <div
+<main
+  class="flex min-h-0 flex-1 items-center overflow-hidden bg-[#242044] text-[#fbf9ff]"
+>
 
-      class="mx-auto grid w-full max-w-7xl items-center gap-6 px-5 py-4 sm:gap-8 sm:px-8 sm:py-5 md:grid-cols-2 md:gap-10 md:py-6 lg:gap-20 lg:px-12 lg:py-8"
+   
+<div
+  class="mx-auto grid min-h-0 w-full max-w-7xl grid-cols-1 items-center gap-4 px-4 py-3 sm:gap-8 sm:px-8 sm:py-5 md:grid-cols-2 md:gap-10 md:py-6 lg:gap-20 lg:px-12 lg:py-8"
+>
 
-    >
 
       <!-- Hero -->
 

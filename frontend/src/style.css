@@ -147,3 +147,92 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     transition-duration: 0.01ms !important;
   }
 }
+
+
+
+@media (max-width: 767px) {
+  main {
+    min-height: 0;
+  }
+
+  main > div {
+    grid-template-rows: minmax(0, 1fr);
+    gap: 0;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  main > div > section:last-child {
+    width: 100%;
+    max-width: 26rem;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  main > div > section:last-child > div:first-child {
+    margin-bottom: 1rem;
+  }
+
+  main > div > section:last-child h2 {
+    margin-top: 0;
+    font-size: 1.75rem;
+    line-height: 1.2;
+  }
+
+  main > div > section:last-child > div:first-child > p {
+    margin-top: 0.375rem;
+    font-size: 0.8125rem;
+    line-height: 1.4;
+  }
+
+  main form {
+    gap: 0.75rem;
+  }
+
+  main form label {
+    margin-bottom: 0.375rem;
+  }
+
+  main form input {
+    height: 2.75rem;
+  }
+
+  main form button[type="submit"] {
+    height: 2.75rem;
+    margin-top: 0.25rem;
+  }
+
+  main > div > section:last-child > div:last-child {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+  }
+
+  main > div > section:last-child > div:last-child p {
+    font-size: 0.6875rem;
+    line-height: 1.4;
+  }
+}
+
+@media (max-width: 767px) and (max-height: 700px) {
+  main > div {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+  }
+
+  main > div > section:last-child > div:first-child {
+    margin-bottom: 0.75rem;
+  }
+
+  main > div > section:last-child h2 {
+    font-size: 1.5rem;
+  }
+
+  main form {
+    gap: 0.625rem;
+  }
+
+  main > div > section:last-child > div:last-child {
+    margin-top: 0.75rem;
+    padding-top: 0.5rem;
+  }
+}
