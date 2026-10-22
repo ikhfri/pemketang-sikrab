@@ -112,11 +112,11 @@ function toWIBTimestamp(value: string): string {
 }
 
 export const api = {
-  login: (nim: string, password: string) =>
-    apiRequest<{ user: User; redirectTo?: string }>("/api/v1/auth/login", {
-      method: "POST",
-      body: JSON.stringify({ nim, password }),
-    }),
+login: (nim: string, password: string) =>
+  apiRequest<{ user: User; redirectTo?: string }>("/api/v1/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ nim, password }),
+  }),
 
   me: () => apiRequest<{ user: User }>("/api/v1/auth/me"),
 

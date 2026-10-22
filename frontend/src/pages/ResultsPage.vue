@@ -140,17 +140,20 @@ onMounted(async () => {
     loading.value = false;
   }
 
-  timer = setInterval(() => {
-    if (countdown.value <= 1) {
-      countdown.value = 0;
-      showResults.value = true;
+timer = setInterval(() => {
+  if (countdown.value <= 1) {
+    countdown.value = 0;
+    showResults.value = true;
 
-      if (timer) clearInterval(timer);
-    } else {
-      countdown.value -= 1;
-    }
-  }, 1000);
-});
+    if (timer) clearInterval(timer);
+    return;
+  }
+
+  countdown.value =
+    countdown.value > 3
+      ? countdown.value - 1
+      : countdown.value - 0.5;
+}, 1000);})
 
 onUnmounted(() => {
   if (timer) clearInterval(timer);
