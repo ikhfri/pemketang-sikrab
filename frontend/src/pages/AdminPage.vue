@@ -1248,7 +1248,7 @@ onBeforeUnmount(() => {
 
                     <span class="mb-2 block text-xs text-[#c4bddb]">URL foto</span>
 
-                    <input v-model="candidateForm.ketuaPhotoUrl" type="url" placeholder="https://..." class="admin-input" />
+                    <input v-model="candidateForm.ketuaPhotoUrl" type="text" placeholder="https://..." class="admin-input" />
 
                   </label>
 
@@ -1270,7 +1270,7 @@ onBeforeUnmount(() => {
 
                     <span class="mb-2 block text-xs text-[#c4bddb]">URL foto</span>
 
-                    <input v-model="candidateForm.wakilPhotoUrl" type="url" placeholder="https://..." class="admin-input" />
+                    <input v-model="candidateForm.wakilPhotoUrl" type="text" placeholder="https://..." class="admin-input" />
 
                   </label>
 
