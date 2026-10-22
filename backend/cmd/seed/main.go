@@ -7,6 +7,8 @@ import (
 	"os"
 	"time"
 
+	"voting-angkatan/backend/internal/security"
+
 	"github.com/alexedwards/argon2id"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
@@ -16,7 +18,7 @@ func main() {
 	_ = godotenv.Load()
 
 	// Wajib menggunakan koneksi testing khusus.
-	databaseURL := os.Getenv("DATABASE_URL")
+	databaseURL := os.Getenv("TEST_DATABASE_URL")
 	if databaseURL == "" {
 		log.Fatal("TEST_DATABASE_URL belum diatur di .env")
 	}
@@ -40,7 +42,7 @@ func main() {
 	// Password khusus akun pengujian.
 	adminHash, err := argon2id.CreateHash(
 		"TestAdmin123!",
-		argon2id.DefaultParams,
+		security.PasswordParams,
 	)
 	if err != nil {
 		log.Fatalf("Gagal hash password admin: %v", err)
@@ -48,7 +50,7 @@ func main() {
 
 	voterHash, err := argon2id.CreateHash(
 		"TestVoter123!",
-		argon2id.DefaultParams,
+		security.PasswordParams,
 	)
 	if err != nil {
 		log.Fatalf("Gagal hash password voter: %v", err)
