@@ -13,8 +13,9 @@ func RegisterRoutes(router *gin.Engine, pool *pgxpool.Pool, cfg config.Config) {
 	router.GET("/ready", readiness(pool))
 
 	api := router.Group("/api/v1")
+	limiter := middleware.NewLoginLimiter(5)
 	auth := api.Group("/auth")
-	auth.POST("/login", login(pool, cfg))
+	auth.POST("/login", limiter.Middleware(), login(pool, cfg))
 	auth.GET("/me", me(pool, cfg))
 	auth.POST("/logout", logout(pool, cfg))
 
