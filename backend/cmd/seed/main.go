@@ -1,3 +1,4 @@
+
 package main
 
 import (
@@ -17,10 +18,17 @@ import (
 func main() {
 	_ = godotenv.Load()
 
-	// Wajib menggunakan koneksi testing khusus.
-	databaseURL := os.Getenv("TEST_DATABASE_URL")
+	databaseURL := os.Getenv("DATABASE_URL")
 	if databaseURL == "" {
-		log.Fatal("TEST_DATABASE_URL belum diatur di .env")
+		log.Fatal("DATABASE_URL belum diatur di .env")
+	}
+
+	adminNIM := os.Getenv("ADMIN_NIM")
+	adminName := os.Getenv("ADMIN_NAME")
+	adminPassword := os.Getenv("ADMIN_PASSWORD")
+
+	if adminNIM == "" || adminName == "" || adminPassword == "" {
+		log.Fatal("ADMIN_NIM, ADMIN_NAME, dan ADMIN_PASSWORD wajib diatur di .env")
 	}
 
 	ctx, cancel := context.WithTimeout(
@@ -39,21 +47,12 @@ func main() {
 		log.Fatalf("Database tidak bisa diakses: %v", err)
 	}
 
-	// Password khusus akun pengujian.
-	adminHash, err := argon2id.CreateHash(
-		"TestAdmin123!",
+	passwordHash, err := argon2id.CreateHash(
+		adminPassword,
 		security.PasswordParams,
 	)
 	if err != nil {
 		log.Fatalf("Gagal hash password admin: %v", err)
-	}
-
-	voterHash, err := argon2id.CreateHash(
-		"TestVoter123!",
-		security.PasswordParams,
-	)
-	if err != nil {
-		log.Fatalf("Gagal hash password voter: %v", err)
 	}
 
 	tx, err := pool.Begin(ctx)
@@ -62,56 +61,41 @@ func main() {
 	}
 	defer tx.Rollback(ctx)
 
-	// Akun pengujian. Tidak mengubah akun yang sudah ada.
-	_, err = tx.Exec(ctx, `
-		INSERT INTO users
-			(id, nim, name, kelompok, password, role, has_voted)
-		VALUES
-			($1, $2, $3, $4, $5, $6, $7),
-			($8, $9, $10, $11, $12, $13, $14)
-		ON CONFLICT DO NOTHING
+	// Buat admin hanya jika NIM belum terdaftar.
+	// Jika sudah ada, data yang ada tidak diubah.
+	tag, err := tx.Exec(ctx, `
+		INSERT INTO users (
+			id,
+			nim,
+			name,
+			kelompok,
+			password,
+			role,
+			has_voted
+		)
+		VALUES ($1, $2, $3, $4, $5, 'ADMIN', FALSE)
+		ON CONFLICT (nim) DO NOTHING
 	`,
-		"test-user-admin", "TESTADMIN001",
-		"Admin Testing", "ADMIN", adminHash, "ADMIN", false,
-		"test-user-voter", "TESTVOTER001",
-		"Voter Testing", "TEST", voterHash, "VOTER", false,
+		"admin-"+adminNIM,
+		adminNIM,
+		adminName,
+		"ADMIN",
+		passwordHash,
 	)
 	if err != nil {
-		log.Fatalf("Gagal seed users: %v", err)
-	}
-
-	// Kandidat dummy tanpa membuat suara.
-	_, err = tx.Exec(ctx, `
-		INSERT INTO candidates
-			(id, ketua_name, ketua_photo_url,
-			 wakil_name, wakil_photo_url, vision, mission)
-		VALUES
-			($1, $2, NULL, $3, NULL, $4, $5),
-			($6, $7, NULL, $8, NULL, $9, $10)
-		ON CONFLICT DO NOTHING
-	`,
-		"TEST-CANDIDATE-01",
-		"Kandidat Testing Satu",
-		"Pasangan Testing Satu",
-		"Visi pengujian satu",
-		"Misi pengujian satu",
-		"TEST-CANDIDATE-02",
-		"Kandidat Testing Dua",
-		"Pasangan Testing Dua",
-		"Visi pengujian dua",
-		"Misi pengujian dua",
-	)
-	if err != nil {
-		log.Fatalf("Gagal seed candidates: %v", err)
+		log.Fatalf("Gagal membuat akun admin: %v", err)
 	}
 
 	if err := tx.Commit(ctx); err != nil {
-		log.Fatalf("Gagal menyimpan seed: %v", err)
+		log.Fatalf("Gagal menyimpan akun admin: %v", err)
 	}
 
-	fmt.Println("Seed testing selesai.")
-	fmt.Println("Admin NIM : TESTADMIN001")
-	fmt.Println("Voter NIM : TESTVOTER001")
-	fmt.Println("Password disimpan dalam bentuk hash.")
-	fmt.Println("Tidak ada suara dummy yang dibuat.")
+	if tag.RowsAffected() == 0 {
+		fmt.Println("NIM sudah terdaftar. Tidak ada data yang diubah.")
+		return
+	}
+
+	fmt.Println("Seed admin berhasil.")
+	fmt.Printf("Admin NIM: %s\n", adminNIM)
+	fmt.Println("Password disimpan menggunakan Argon2id.")
 }

@@ -84,8 +84,6 @@ func submitVote(pool *pgxpool.Pool, cfg config.Config) gin.HandlerFunc {
 		}
 		defer func() { _ = tx.Rollback(context.Background()) }()
 
-		// Kunci row jadwal agar perubahan setting admin tidak bersilangan
-		// dengan keputusan buka/tutup dalam transaksi ini.
 		var openAt, closeAt time.Time
 		err = tx.QueryRow(ctx, `
 			SELECT open_at, close_at
@@ -127,8 +125,6 @@ func submitVote(pool *pgxpool.Pool, cfg config.Config) gin.HandlerFunc {
 			return
 		}
 
-		// Atomic compare-and-set: hanya satu request yang bisa mengubah
-		// has_voted dari false menjadi true untuk user yang sama.
 		var updatedID string
 		err = tx.QueryRow(ctx, `
 			UPDATE users
@@ -164,7 +160,6 @@ func submitVote(pool *pgxpool.Pool, cfg config.Config) gin.HandlerFunc {
 			return
 		}
 
-		// Pertahankan perilaku lama: setelah voting sukses, session dicabut.
 		sessionID, cookieErr := c.Cookie(cfg.SessionCookie)
 		if cookieErr == nil && sessionID != "" {
 			_, _ = pool.Exec(ctx, `DELETE FROM sessions WHERE id = $1`, sessionID)

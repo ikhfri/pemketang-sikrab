@@ -14,6 +14,7 @@ func RegisterRoutes(router *gin.Engine, pool *pgxpool.Pool, cfg config.Config) {
 
 	api := router.Group("/api/v1")
 	limiter := middleware.NewLoginLimiter(5)
+
 	auth := api.Group("/auth")
 	auth.POST("/login", limiter.Middleware(), login(pool, cfg))
 	auth.GET("/me", me(pool, cfg))
@@ -23,5 +24,6 @@ func RegisterRoutes(router *gin.Engine, pool *pgxpool.Pool, cfg config.Config) {
 	protected.Use(middleware.RequireSession(pool, cfg))
 	protected.GET("/candidates", listCandidates(pool))
 	protected.POST("/votes", submitVote(pool, cfg))
+
 	registerAdminRoutes(api, pool, cfg)
 }
