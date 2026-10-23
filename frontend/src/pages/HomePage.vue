@@ -68,7 +68,7 @@ onMounted(() => {
       <!-- Introduction -->
      
 <div class="landing-intro flex min-w-0 flex-col items-start justify-center">
-  <div class="w-full max-w-127.5">
+  <div class="w-full max-w-127.5 text-center sm:text-left">
 
     <h1
       class="m-0 text-[clamp(2.75rem,5.2vw,4.5rem)] font-bold leading-[1.08] tracking-[-0.055em] text-[#fbf9ff]"
