@@ -74,8 +74,8 @@ async function confirmVote() {
           <p class="text-sm text-white/60">{{ greeting }},</p>
           <p class="mt-1 text-lg font-semibold">{{ user?.name || "Pemilih" }}</p>
         </div>
-        <h1 class="text-3xl font-semibold tracking-tight sm:text-4xl">Pemilihan Ketua Angkatan</h1>
-        <p class="mt-3 max-w-xl text-sm leading-6 text-white/70 sm:text-base">Pilih pasangan ketua dan wakil ketua angkatan yang menurut lo paling tepat.</p>
+        <h1 class="text-3xl font-semibold tracking-tight sm:text-4xl">Who's the Next</h1>
+        <p class="mt-3 max-w-xl text-sm leading-6 text-white/70 sm:text-base">Pilih pemimpin yang akan memimpin perjalanan kedepannya di TEK 63</p>
       </header>
 
       <div v-if="errorMessage" role="alert" class="mb-6 rounded-lg border border-red-300/30 bg-red-400/10 px-4 py-3 text-sm text-red-100">{{ errorMessage }}</div>

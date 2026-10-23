@@ -244,8 +244,7 @@ async function handleSubmit() {
   <p
     class="mt-5 max-w-md text-sm leading-7 text-[#b8b5c5] lg:mt-6 lg:text-base"
   >
-    Kenali setiap pilihan, tentukan siapa yang paling lo percaya,
-    dan jadi bagian dari langkah Angkatan 63 selanjutnya.
+    Setiap pilihan punya arti. Kenali calon pemimpinmu, tentukan pelihanmu dan ambil bagian dalam perjalananmu di TEK 63.
   </p>
 </section>
 
@@ -706,57 +705,6 @@ async function handleSubmit() {
 
         <div class="mt-5 flex items-start gap-3 border-t border-white/10 pt-4">
 
-          <svg
-
-            viewBox="0 0 24 24"
-
-            fill="none"
-
-            class="mt-0.5 h-5 w-5 shrink-0 text-[#85859f]"
-
-            aria-hidden="true"
-
-          >
-
-            <rect
-
-              x="5"
-
-              y="10"
-
-              width="14"
-
-              height="10"
-
-              rx="2"
-
-              stroke="currentColor"
-
-              stroke-width="1.5"
-
-            />
-
-            <path
-
-              d="M8 10V7a4 4 0 018 0v3"
-
-              stroke="currentColor"
-
-              stroke-width="1.5"
-
-              stroke-linecap="round"
-
-            />
-
-          </svg>
-
-          <p class="text-xs leading-5 text-[#85859f]">
-
-            Gunakan akun lo sendiri dan jangan bagikan kata sandi kepada orang
-
-            lain. Data login lo harus tetap aman.
-
-          </p>
 
         </div>
 

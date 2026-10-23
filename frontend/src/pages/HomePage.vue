@@ -73,17 +73,16 @@ onMounted(() => {
     <h1
       class="m-0 text-[clamp(2.75rem,5.2vw,4.5rem)] font-bold leading-[1.08] tracking-[-0.055em] text-[#fbf9ff]"
     >
-      The Next Chapter.
+      The Next Chapter Of
       <br />
-      <span class="text-[#c9b5ff]">Starts With Us.</span>
+      <span class="text-[#c9b5ff]">TEK 63 </span>
     </h1>
 
     <p
       class="landing-description mt-5 max-w-md text-sm leading-7 text-[#b8b2cc] sm:mt-6 sm:text-[15px]"
     >
       Setiap angkatan punya ceritanya sendiri. Sekarang, saatnya
-      menentukan siapa yang akan membawa Angkatan 63 ke babak
-      berikutnya.
+      menentukan siapa yang akan membawa Angkatan 63 di buku cerita Teknologi Rekayasa Komputer IPB University
     </p>
 
     <RouterLink
