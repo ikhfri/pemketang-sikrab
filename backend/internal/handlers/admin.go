@@ -2,25 +2,15 @@ package handlers
 
 import (
 	"context"
-
 	"errors"
-
-	"net/http"
-
-	"strings"
-
-	"time"
-
 	"github.com/gin-gonic/gin"
-
 	"github.com/google/uuid"
-
 	"github.com/jackc/pgx/v5"
-
 	"github.com/jackc/pgx/v5/pgxpool"
-
+	"net/http"
+	"strings"
+	"time"
 	"voting-angkatan/backend/internal/config"
-
 	"voting-angkatan/backend/internal/importusers"
 	"voting-angkatan/backend/internal/middleware"
 )
@@ -30,35 +20,21 @@ const votingSettingsID = "voting-settings"
 var wibLocation = time.FixedZone("WIB", 7*60*60)
 
 type candidateInput struct {
-	KetuaName string `json:"ketuaName" binding:"required"`
-
-	KetuaPhotoURL *string `json:"ketuaPhotoUrl"`
-
-	WakilName string `json:"wakilName" binding:"required"`
-
-	WakilPhotoURL *string `json:"wakilPhotoUrl"`
-
-	Vision *string `json:"vision"`
-
-	Mission *string `json:"mission"`
+	KetuaName string  `json:"ketuaName" binding:"required"`
+	WakilName string  `json:"wakilName" binding:"required"`
+	PhotoURL  *string `json:"photoUrl"`
+	Vision    *string `json:"vision"`
+	Mission   *string `json:"mission"`
 }
 
 type adminCandidateResponse struct {
-	ID string `json:"id"`
-
-	KetuaName string `json:"ketuaName"`
-
-	KetuaPhotoURL *string `json:"ketuaPhotoUrl"`
-
-	WakilName string `json:"wakilName"`
-
-	WakilPhotoURL *string `json:"wakilPhotoUrl"`
-
-	Vision *string `json:"vision"`
-
-	Mission *string `json:"mission"`
-
-	VoteCount int64 `json:"voteCount"`
+	ID        string  `json:"id"`
+	KetuaName string  `json:"ketuaName"`
+	WakilName string  `json:"wakilName"`
+	PhotoURL  *string `json:"photoUrl"`
+	Vision    *string `json:"vision"`
+	Mission   *string `json:"mission"`
+	VoteCount int64   `json:"voteCount"`
 }
 
 type voterResponse struct {
@@ -74,28 +50,46 @@ type voterResponse struct {
 }
 
 func registerAdminRoutes(
+
 	router *gin.RouterGroup,
+
 	pool *pgxpool.Pool,
+
 	cfg config.Config,
+
 ) {
+
 	admin := router.Group("/admin")
+
 	admin.Use(
+
 		middleware.RequireSession(pool, cfg),
+
 		middleware.RequireAdmin(),
 	)
 
 	// Endpoint admin lainnya
+
 	admin.GET("/dashboard", adminDashboard(pool))
+
 	admin.GET("/results", adminResults(pool))
+
 	admin.GET("/voting-settings", getVotingSettings(pool))
+
 	admin.PUT("/voting-settings", updateVotingSettings(pool))
+
 	admin.POST("/candidates", createCandidate(pool))
+
 	admin.PUT("/candidates/:id", updateCandidate(pool))
+
 	admin.DELETE("/candidates/:id", deleteCandidate(pool))
+
 	admin.POST("/voters/:id/reset-vote", resetVoterVote(pool))
 
 	// Wajib didaftarkan
+
 	importusers.Register(admin, pool)
+
 }
 
 // adminDashboard returns the complete payload needed by the Vue admin dashboard.*
@@ -126,13 +120,13 @@ func adminDashboard(pool *pgxpool.Pool) gin.HandlerFunc {
 			query string
 		}{
 
-			{&totalVoters, `SELECT COUNT(*) FROM users WHERE role::text = 'VOTER'`},
+			{&totalVoters, `SELECT COUNT(*) FROM public.users WHERE role::text = 'VOTER'`},
 
-			{&votedCount, `SELECT COUNT(*) FROM users WHERE role::text = 'VOTER' AND has_voted = TRUE`},
+			{&votedCount, `SELECT COUNT(*) FROM public.users WHERE role::text = 'VOTER' AND has_voted = TRUE`},
 
-			{&totalVotes, `SELECT COUNT(*) FROM votes`},
+			{&totalVotes, `SELECT COUNT(*) FROM public.votes`},
 
-			{&totalCandidates, `SELECT COUNT(*) FROM candidates`},
+			{&totalCandidates, `SELECT COUNT(*) FROM public.candidates`},
 		}
 
 		for _, item := range queries {
@@ -153,7 +147,7 @@ func adminDashboard(pool *pgxpool.Pool) gin.HandlerFunc {
 
             SELECT id, nim, name, kelompok, has_voted
 
-            FROM users
+            FROM public.users
 
             WHERE role::text = 'VOTER'
 
@@ -202,19 +196,12 @@ func adminDashboard(pool *pgxpool.Pool) gin.HandlerFunc {
 		candidates := make([]adminCandidateResponse, 0)
 
 		candidateRows, err := pool.Query(ctx, `
-
-            SELECT c.id, c.ketua_name, c.ketua_photo_url, c.wakil_name,
-
-                   c.wakil_photo_url, c.vision, c.mission, COUNT(v.id)::bigint AS vote_count
-
-            FROM candidates c
-
-            LEFT JOIN votes v ON v.candidate_id = c.id
-
+            SELECT c.id, c.ketua_name, c.wakil_name, c.photo_url,
+                   c.vision, c.mission, COUNT(v.id)::bigint AS vote_count
+            FROM public.candidates c
+            LEFT JOIN public.votes v ON v.candidate_id = c.id
             GROUP BY c.id
-
             ORDER BY c.created_at ASC, c.id ASC
-
         `)
 
 		if err != nil {
@@ -229,9 +216,15 @@ func adminDashboard(pool *pgxpool.Pool) gin.HandlerFunc {
 
 			var item adminCandidateResponse
 
-			if err := candidateRows.Scan(&item.ID, &item.KetuaName, &item.KetuaPhotoURL,
-
-				&item.WakilName, &item.WakilPhotoURL, &item.Vision, &item.Mission, &item.VoteCount); err != nil {
+			if err := candidateRows.Scan(
+				&item.ID,
+				&item.KetuaName,
+				&item.WakilName,
+				&item.PhotoURL,
+				&item.Vision,
+				&item.Mission,
+				&item.VoteCount,
+			); err != nil {
 
 				candidateRows.Close()
 
@@ -280,7 +273,7 @@ func adminDashboard(pool *pgxpool.Pool) gin.HandlerFunc {
 
             SELECT open_at, close_at
 
-            FROM voting_settings
+            FROM public.voting_settings
 
             WHERE id = $1
 
@@ -290,13 +283,7 @@ func adminDashboard(pool *pgxpool.Pool) gin.HandlerFunc {
 
 		if err == nil {
 
-			// Drizzle schema uses timestamp without time zone; values are stored as UTC wall time.*
-
-			openAt = time.Date(openAt.Year(), openAt.Month(), openAt.Day(), openAt.Hour(), openAt.Minute(), openAt.Second(), openAt.Nanosecond(), time.UTC)
-
-			closeAt = time.Date(closeAt.Year(), closeAt.Month(), closeAt.Day(), closeAt.Hour(), closeAt.Minute(), closeAt.Second(), closeAt.Nanosecond(), time.UTC)
-
-			now := time.Now().UTC()
+			now := time.Now()
 
 			status := "CLOSED"
 
@@ -393,19 +380,12 @@ func adminResults(pool *pgxpool.Pool) gin.HandlerFunc {
 		defer cancel()
 
 		rows, err := pool.Query(ctx, `
-
-            SELECT c.id, c.ketua_name, c.ketua_photo_url, c.wakil_name,
-
-                   c.wakil_photo_url, c.vision, c.mission, COUNT(v.id)::bigint AS vote_count
-
-        FROM candidates c
-
-        LEFT JOIN votes v ON v.candidate_id = c.id
-
-        GROUP BY c.id
-
-        ORDER BY vote_count DESC, c.created_at ASC, c.id ASC
-
+            SELECT c.id, c.ketua_name, c.wakil_name, c.photo_url,
+                   c.vision, c.mission, COUNT(v.id)::bigint AS vote_count
+            FROM public.candidates c
+            LEFT JOIN public.votes v ON v.candidate_id = c.id
+            GROUP BY c.id
+            ORDER BY vote_count DESC, c.created_at ASC, c.id ASC
         `)
 
 		if err != nil {
@@ -424,9 +404,15 @@ func adminResults(pool *pgxpool.Pool) gin.HandlerFunc {
 
 			var item adminCandidateResponse
 
-			if err := rows.Scan(&item.ID, &item.KetuaName, &item.KetuaPhotoURL,
-
-				&item.WakilName, &item.WakilPhotoURL, &item.Vision, &item.Mission, &item.VoteCount); err != nil {
+			if err := rows.Scan(
+				&item.ID,
+				&item.KetuaName,
+				&item.WakilName,
+				&item.PhotoURL,
+				&item.Vision,
+				&item.Mission,
+				&item.VoteCount,
+			); err != nil {
 
 				internalError(c)
 
@@ -448,7 +434,7 @@ func adminResults(pool *pgxpool.Pool) gin.HandlerFunc {
 
 		var totalVotes int64
 
-		if err := pool.QueryRow(ctx, `SELECT COUNT(*) FROM votes`).Scan(&totalVotes); err != nil {
+		if err := pool.QueryRow(ctx, `SELECT COUNT(*) FROM public.votes`).Scan(&totalVotes); err != nil {
 
 			internalError(c)
 
@@ -514,7 +500,7 @@ func getVotingSettings(pool *pgxpool.Pool) gin.HandlerFunc {
 
             SELECT open_at, close_at
 
-            FROM voting_settings
+            FROM public.voting_settings
 
             WHERE id = $1
 
@@ -537,10 +523,6 @@ func getVotingSettings(pool *pgxpool.Pool) gin.HandlerFunc {
 			return
 
 		}
-
-		openAt = time.Date(openAt.Year(), openAt.Month(), openAt.Day(), openAt.Hour(), openAt.Minute(), openAt.Second(), openAt.Nanosecond(), time.UTC)
-
-		closeAt = time.Date(closeAt.Year(), closeAt.Month(), closeAt.Day(), closeAt.Hour(), closeAt.Minute(), closeAt.Second(), closeAt.Nanosecond(), time.UTC)
 
 		c.JSON(http.StatusOK, gin.H{
 
@@ -605,7 +587,7 @@ func updateVotingSettings(pool *pgxpool.Pool) gin.HandlerFunc {
 
 		_, err = pool.Exec(ctx, `
 
-            INSERT INTO voting_settings (id, open_at, close_at, updated_at)
+            INSERT INTO public.voting_settings (id, open_at, close_at, updated_at)
 
             VALUES ($1, $2, $3, NOW())
 
@@ -666,9 +648,7 @@ func validateCandidateInput(input *candidateInput) string {
 
 	input.WakilName = strings.TrimSpace(input.WakilName)
 
-	input.KetuaPhotoURL = cleanOptional(input.KetuaPhotoURL)
-
-	input.WakilPhotoURL = cleanOptional(input.WakilPhotoURL)
+	input.PhotoURL = cleanOptional(input.PhotoURL)
 
 	input.Vision = cleanOptional(input.Vision)
 
@@ -725,14 +705,10 @@ func createCandidate(pool *pgxpool.Pool) gin.HandlerFunc {
 		id := uuid.NewString()
 
 		_, err := pool.Exec(ctx, `
-
-            INSERT INTO candidates
-
-                (id, ketua_name, ketua_photo_url, wakil_name, wakil_photo_url, vision, mission, created_at, updated_at)
-
-            VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
-
-        `, id, input.KetuaName, input.KetuaPhotoURL, input.WakilName, input.WakilPhotoURL, input.Vision, input.Mission)
+            INSERT INTO public.candidates
+                (id, ketua_name, wakil_name, photo_url, vision, mission, created_at)
+            VALUES ($1, $2, $3, $4, $5, $6, NOW())
+        `, id, input.KetuaName, input.WakilName, input.PhotoURL, input.Vision, input.Mission)
 
 		if err != nil {
 
@@ -785,17 +761,14 @@ func updateCandidate(pool *pgxpool.Pool) gin.HandlerFunc {
 		defer cancel()
 
 		tag, err := pool.Exec(ctx, `
-
-            UPDATE candidates SET
-
-                ketua_name = $1, ketua_photo_url = $2, wakil_name = $3,
-
-                wakil_photo_url = $4, vision = $5, mission = $6, updated_at = NOW()
-
-            WHERE id = $7
-
-        `, input.KetuaName, input.KetuaPhotoURL, input.WakilName, input.WakilPhotoURL,
-
+            UPDATE public.candidates SET
+                ketua_name = $1,
+                wakil_name = $2,
+                photo_url = $3,
+                vision = $4,
+                mission = $5
+            WHERE id = $6
+        `, input.KetuaName, input.WakilName, input.PhotoURL,
 			input.Vision, input.Mission, id)
 
 		if err != nil {
@@ -840,7 +813,7 @@ func deleteCandidate(pool *pgxpool.Pool) gin.HandlerFunc {
 
 		var voteID string
 
-		err := pool.QueryRow(ctx, `SELECT id FROM votes WHERE candidate_id = $1 LIMIT 1`, id).Scan(&voteID)
+		err := pool.QueryRow(ctx, `SELECT id FROM public.votes WHERE candidate_id = $1 LIMIT 1`, id).Scan(&voteID)
 
 		if err == nil {
 
@@ -858,7 +831,7 @@ func deleteCandidate(pool *pgxpool.Pool) gin.HandlerFunc {
 
 		}
 
-		tag, err := pool.Exec(ctx, `DELETE FROM candidates WHERE id = $1`, id)
+		tag, err := pool.Exec(ctx, `DELETE FROM public.candidates WHERE id = $1`, id)
 
 		if err != nil {
 
@@ -924,7 +897,7 @@ func resetVoterVote(pool *pgxpool.Pool) gin.HandlerFunc {
 
             SELECT role::text, has_voted
 
-            FROM users
+            FROM public.users
 
             WHERE id = $1
 
@@ -964,7 +937,7 @@ func resetVoterVote(pool *pgxpool.Pool) gin.HandlerFunc {
 
 		}
 
-		tag, err := tx.Exec(ctx, `DELETE FROM votes WHERE user_id = $1`, id)
+		tag, err := tx.Exec(ctx, `DELETE FROM public.votes WHERE user_id = $1`, id)
 
 		if err != nil {
 
@@ -982,7 +955,7 @@ func resetVoterVote(pool *pgxpool.Pool) gin.HandlerFunc {
 
 		}
 
-		if _, err = tx.Exec(ctx, `UPDATE users SET has_voted = FALSE WHERE id = $1 AND role::text = 'VOTER'`, id); err != nil {
+		if _, err = tx.Exec(ctx, `UPDATE public.users SET has_voted = FALSE WHERE id = $1 AND role::text = 'VOTER'`, id); err != nil {
 
 			internalError(c)
 

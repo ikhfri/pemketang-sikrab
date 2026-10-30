@@ -1,37 +1,44 @@
-
 import type { ApiErrorBody, Candidate, User } from "../types";
 
 const API_BASE_URL = (
   import.meta.env.VITE_API_BASE_URL || "http://localhost:8080"
 ).replace(/\/+$/, "");
 
-type JsonRecord = Record<string, unknown>;
 
 function isFormData(body: BodyInit | null | undefined): boolean {
   return typeof FormData !== "undefined" && body instanceof FormData;
 }
 
 async function readResponseBody(response: Response): Promise<unknown> {
-  if (response.status === 204 || response.status === 205) return null;
+  if (response.status === 204 || response.status === 205) {
+    return null;
+  }
 
   const contentType = response.headers.get("content-type") ?? "";
-  const text = await response.text();
+  const responseText = await response.text();
 
-  if (!text.trim()) return null;
+  if (!responseText.trim()) {
+    return null;
+  }
 
-  if (contentType.includes("application/json") || contentType.includes("+json")) {
+  if (
+    contentType.includes("application/json") ||
+    contentType.includes("+json")
+  ) {
     try {
-      return JSON.parse(text) as unknown;
+      return JSON.parse(responseText) as unknown;
     } catch {
       throw new Error("Server mengirim respons JSON yang tidak valid.");
     }
   }
 
-  return text;
+  return responseText;
 }
 
 function getErrorMessage(body: unknown, status: number): string {
-  if (typeof body === "string" && body.trim()) return body.trim();
+  if (typeof body === "string" && body.trim()) {
+    return body.trim();
+  }
 
   if (body && typeof body === "object") {
     const errorBody = body as Partial<ApiErrorBody> & {
@@ -40,9 +47,9 @@ function getErrorMessage(body: unknown, status: number): string {
     };
 
     const message =
-      errorBody.message ||
-      errorBody.error ||
-      errorBody.detail ||
+      errorBody.message ??
+      errorBody.error ??
+      errorBody.detail ??
       errorBody.title;
 
     if (typeof message === "string" && message.trim()) {
@@ -50,27 +57,26 @@ function getErrorMessage(body: unknown, status: number): string {
     }
   }
 
-  if (status === 401) {
-    return "Sesi berakhir atau Anda belum login. Silakan login kembali.";
-  }
+  switch (status) {
+    case 400:
+      return "Permintaan tidak valid. Periksa kembali data yang dikirim.";
+    case 401:
+      return "Sesi berakhir atau Anda belum login. Silakan login kembali.";
+    case 403:
+      return "Anda tidak memiliki izin untuk melakukan tindakan ini.";
+    case 404:
+      return "Endpoint atau data yang diminta tidak ditemukan.";
+    case 409:
+      return "Permintaan bertentangan dengan kondisi data saat ini.";
+    case 422:
+      return "Data yang dikirim tidak dapat diproses. Periksa kembali input Anda.";
+    default:
+      if (status >= 500) {
+        return "Terjadi kesalahan pada server. Silakan coba lagi.";
+      }
 
-  if (status === 403) {
-    return "Anda tidak memiliki izin untuk melakukan tindakan ini.";
+      return `Permintaan gagal (HTTP ${status}).`;
   }
-
-  if (status === 404) {
-    return "Endpoint atau data yang diminta tidak ditemukan.";
-  }
-
-  if (status === 409) {
-    return "Permintaan bertentangan dengan kondisi data saat ini.";
-  }
-
-  if (status >= 500) {
-    return "Terjadi kesalahan pada server. Silakan coba lagi.";
-  }
-
-  return `Permintaan gagal (HTTP ${status}).`;
 }
 
 export async function apiRequest<T>(
@@ -80,6 +86,7 @@ export async function apiRequest<T>(
   const headers = new Headers(options.headers);
   headers.set("Accept", "application/json");
 
+  // Browser harus mengatur Content-Type multipart/form-data beserta boundary.
   if (
     options.body != null &&
     !isFormData(options.body) &&
@@ -125,12 +132,9 @@ export async function apiRequest<T>(
 
 /**
  * Mengirim file Excel sebagai multipart/form-data.
- * Jangan mengatur Content-Type secara manual.
+ * Jangan mengatur Content-Type secara manual karena browser perlu menambahkan boundary.
  */
-async function uploadForm<T>(
-  path: string,
-  file: File,
-): Promise<T> {
+async function uploadForm<T>(path: string, file: File): Promise<T> {
   const formData = new FormData();
   formData.append("file", file);
 
@@ -143,10 +147,7 @@ async function uploadForm<T>(
 /**
  * Mengirim file Excel dan menerima hasil import berupa CSV.
  */
-async function downloadImportResult(
-  path: string,
-  file: File,
-): Promise<Blob> {
+async function downloadImportResult(path: string, file: File): Promise<Blob> {
   const formData = new FormData();
   formData.append("file", file);
 
@@ -308,22 +309,13 @@ export const api = {
 
   // Excel import: preview and validate file
   previewUserImport: (file: File) =>
-    uploadForm<ImportPreview>(
-      "/api/v1/admin/users/import/preview",
-      file,
-    ),
+    uploadForm<ImportPreview>("/api/v1/admin/users/import/preview", file),
 
   // Excel import: append voters and download CSV result
   importUsers: (file: File) =>
-    downloadImportResult(
-      "/api/v1/admin/users/import",
-      file,
-    ),
+    downloadImportResult("/api/v1/admin/users/import", file),
 
   // Excel import: replace all voters and download CSV result
   replaceUsers: (file: File) =>
-    downloadImportResult(
-      "/api/v1/admin/users/import/replace",
-      file,
-    ),
+    downloadImportResult("/api/v1/admin/users/import/replace", file),
 };

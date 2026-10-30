@@ -1,3 +1,4 @@
+
 export type UserRole = "ADMIN" | "VOTER";
 
 export interface User {
@@ -12,9 +13,8 @@ export interface User {
 export interface Candidate {
   id: string;
   ketuaName: string;
-  ketuaPhotoUrl: string | null;
   wakilName: string;
-  wakilPhotoUrl: string | null;
+  photoUrl: string | null;
   vision: string | null;
   mission: string | null;
   voteCount?: number;

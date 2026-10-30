@@ -12,11 +12,9 @@ interface Candidate {
 
   ketuaName: string;
 
-  ketuaPhotoUrl: string | null;
-
   wakilName: string;
 
-  wakilPhotoUrl: string | null;
+  photoUrl: string | null;
 
   vision: string | null;
 
@@ -86,11 +84,9 @@ interface CandidatePayload {
 
   ketuaName: string;
 
-  ketuaPhotoUrl: string | null;
-
   wakilName: string;
 
-  wakilPhotoUrl: string | null;
+  photoUrl: string | null;
 
   vision: string | null;
 
@@ -173,11 +169,9 @@ const emptyCandidateForm = (): CandidatePayload => ({
 
   ketuaName: "",
 
-  ketuaPhotoUrl: null,
-
   wakilName: "",
 
-  wakilPhotoUrl: null,
+  photoUrl: null,
 
   vision: "",
 
@@ -485,11 +479,9 @@ function startEdit(candidate: Candidate) {
 
     ketuaName: candidate.ketuaName,
 
-    ketuaPhotoUrl: candidate.ketuaPhotoUrl ?? null,
-
     wakilName: candidate.wakilName,
 
-    wakilPhotoUrl: candidate.wakilPhotoUrl ?? null,
+    photoUrl: candidate.photoUrl ?? null,
 
     vision: candidate.vision ?? "",
 
@@ -549,11 +541,9 @@ async function saveCandidate() {
 
       ketuaName,
 
-      ketuaPhotoUrl: candidateForm.value.ketuaPhotoUrl?.trim() || null,
-
       wakilName,
 
-      wakilPhotoUrl: candidateForm.value.wakilPhotoUrl?.trim() || null,
+      photoUrl: candidateForm.value.photoUrl?.trim() || null,
 
       vision: candidateForm.value.vision?.trim() || null,
 
@@ -847,7 +837,6 @@ async function logout() {
 onMounted(() => {
 
   void loadDashboard();
-
 
 
   statusTimer = setInterval(() => {
@@ -1361,14 +1350,6 @@ onBeforeUnmount(() => {
 
                   </label>
 
-                  <label class="block">
-
-                    <span class="mb-2 block text-xs text-[#c4bddb]">URL foto</span>
-
-                    <input v-model="candidateForm.ketuaPhotoUrl" type="url" placeholder="https\://..." class="admin-input" />
-
-                  </label>
-
                 </div>
 
                 <div class="rounded-xl border border-white/[0.07] p-4">
@@ -1383,17 +1364,19 @@ onBeforeUnmount(() => {
 
                   </label>
 
-                  <label class="block">
-
-                    <span class="mb-2 block text-xs text-[#c4bddb]">URL foto</span>
-
-                    <input v-model="candidateForm.wakilPhotoUrl" type="url" placeholder="https\://..." class="admin-input" />
-
-                  </label>
-
                 </div>
 
               </div>
+
+              <label class="block">
+
+                <span class="mb-2 block text-sm font-medium">Foto pasangan calon</span>
+
+                <input v-model="candidateForm.photoUrl" type="url" placeholder="https://..." class="admin-input" />
+
+                <span class="mt-2 block text-xs text-[#a99fc5]">Gunakan satu foto yang menampilkan ketua dan wakil.</span>
+
+              </label>
 
               <div class="grid gap-4 lg:grid-cols-2">
 
@@ -1451,8 +1434,6 @@ onBeforeUnmount(() => {
 
                     <input v-model.trim="candidateForm.ketuaName" required class="admin-input" placeholder="Nama ketua" />
 
-                    <input v-model="candidateForm.ketuaPhotoUrl" type="url" class="admin-input" placeholder="URL foto ketua" />
-
                   </div>
 
                   <div class="space-y-3 rounded-xl border border-white/[0.07] p-4">
@@ -1461,11 +1442,17 @@ onBeforeUnmount(() => {
 
                     <input v-model.trim="candidateForm.wakilName" required class="admin-input" placeholder="Nama wakil" />
 
-                    <input v-model="candidateForm.wakilPhotoUrl" type="url" class="admin-input" placeholder="URL foto wakil" />
-
                   </div>
 
                 </div>
+
+                <label class="block">
+
+                  <span class="mb-2 block text-sm font-medium">Foto pasangan calon</span>
+
+                  <input v-model="candidateForm.photoUrl" type="url" class="admin-input" placeholder="https://..." />
+
+                </label>
 
                 <div class="grid gap-4 md:grid-cols-2">
 
@@ -1525,19 +1512,31 @@ onBeforeUnmount(() => {
 
                 </div>
 
-                <div class="grid gap-3 md:grid-cols-2">
+                <div class="rounded-xl border border-white/[0.07] bg-[#343052] p-4">
 
-                  <div v-for="person in [{ name: candidate.ketuaName, photo: candidate.ketuaPhotoUrl, role: 'Ketua' }, { name: candidate.wakilName, photo: candidate.wakilPhotoUrl, role: 'Wakil ketua' }]" :key="person.role" class="flex items-center gap-3 rounded-xl border border-white/[0.07] bg-[#343052] p-3.5">
+                  <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
 
-                    <img v-if="person.photo" :src="person.photo" :alt="person.name" class="h-16 w-16 rounded-lg object-cover" />
+                    <img v-if="candidate.photoUrl" :src="candidate.photoUrl" :alt="`Pasangan ${candidate.ketuaName} dan ${candidate.wakilName}`" class="h-36 w-full rounded-xl object-cover sm:w-48" />
 
-                    <div v-else class="flex h-16 w-16 items-center justify-center rounded-lg bg-violet-200/10 font-semibold text-violet-100">{{ initials(person.name) }}</div>
+                    <div v-else class="flex h-36 w-full items-center justify-center rounded-xl bg-violet-200/10 text-sm text-violet-100 sm:w-48">Foto belum tersedia</div>
 
-                    <div class="min-w-0">
+                    <div class="min-w-0 space-y-2">
 
-                      <p class="text-xs text-[#a99fc5]">{{ person.role }}</p>
+                      <div>
 
-                      <p class="mt-1 truncate text-sm font-medium">{{ person.name }}</p>
+                        <p class="text-xs text-[#a99fc5]">Calon ketua</p>
+
+                        <p class="font-medium">{{ candidate.ketuaName }}</p>
+
+                      </div>
+
+                      <div>
+
+                        <p class="text-xs text-[#a99fc5]">Calon wakil</p>
+
+                        <p class="font-medium">{{ candidate.wakilName }}</p>
+
+                      </div>
 
                     </div>
 

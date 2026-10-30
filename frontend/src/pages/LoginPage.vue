@@ -218,45 +218,65 @@ async function handleSubmit() {
 
 <template>
 
-
 <main
+
   class="flex min-h-0 flex-1 items-center overflow-hidden bg-[#242044] text-[#fbf9ff]"
+
 >
 
-   
 <div
+
   class="mx-auto grid min-h-0 w-full max-w-7xl grid-cols-1 items-center gap-4 px-4 py-3 sm:gap-8 sm:px-8 sm:py-5 md:grid-cols-2 md:gap-10 md:py-6 lg:gap-20 lg:px-12 lg:py-8"
+
 >
 
+<!-- Hero -->
 
-      <!-- Hero -->
-
-    
 <section class="hidden min-w-0 md:block md:py-2">
+
   <h1
+
     class="m-0 text-4xl leading-[1.08] font-bold tracking-tighter text-[#fbf9ff] lg:text-6xl"
+
   >
+
     Your Voice.
+
     <br />
+
     <span class="text-[#c5b8d6]">Your Choice.</span>
+
   </h1>
 
   <p
+
     class="mt-5 max-w-md text-sm leading-7 text-[#b8b5c5] lg:mt-6 lg:text-base"
+
   >
+
     Setiap pilihan punya arti. Kenali calon pemimpinmu, tentukan pelihanmu dan ambil bagian dalam perjalananmu di TEK 63.
+
   </p>
+
+
 </section>
 
-
-      <!-- Login -->
+<!-- Login -->
 
       <section class="mx-auto w-full max-w-105 min-w-0 md:justify-self-end">
 
+        <!-- Foto Angkatan: tampil hanya di perangkat mobile -->
+        
         <div class="mb-5 sm:mb-6">
-
+          
           <h2 class="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-
+            
+            <img
+              src="/images/fotoangkatan.jpeg"
+              alt="Foto Angkatan 63 SIKRABTEK"
+              class="mb-5 max-h-full w-full rounded-md border border-white/10 object-cover shadow-lg md:hidden"
+              loading="eager"
+            />
             Masuk
 
           </h2>
@@ -269,7 +289,7 @@ async function handleSubmit() {
 
         </div>
 
-        <!-- API error -->
+<!-- API error -->
 
         <div
 
@@ -327,7 +347,7 @@ async function handleSubmit() {
 
         <form class="space-y-4" novalidate @submit.prevent="handleSubmit">
 
-          <!-- NIM -->
+<!-- NIM -->
 
           <div>
 
@@ -441,7 +461,7 @@ async function handleSubmit() {
 
           </div>
 
-          <!-- Password -->
+<!-- Password -->
 
           <div>
 
@@ -655,7 +675,7 @@ async function handleSubmit() {
 
           </div>
 
-          <!-- Submit -->
+<!-- Submit -->
 
           <button
 
@@ -701,10 +721,9 @@ async function handleSubmit() {
 
         </form>
 
-        <!-- Security note -->
+<!-- Security note -->
 
         <div class="mt-5 flex items-start gap-3 border-t border-white/10 pt-4">
-
 
         </div>
 
